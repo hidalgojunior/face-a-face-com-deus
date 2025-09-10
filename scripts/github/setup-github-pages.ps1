@@ -1,0 +1,207 @@
+# Script para configurar GitHub Pages automaticamente
+Write-Host "📄 Configurando GitHub Pages..." -ForegroundColor Green
+
+# Voltar para a raiz do projeto
+Set-Location "d:\dev-server"
+
+# Criar pasta docs se não existir
+if (-not (Test-Path "docs")) {
+    New-Item -ItemType Directory -Name "docs"
+    Write-Host "📁 Pasta docs criada" -ForegroundColor Yellow
+}
+
+# Criar index.html para GitHub Pages
+$indexHtml = @"
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face a Face com Deus - Sistema de Gestão</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 0;
+        }
+        .feature-card {
+            transition: transform 0.3s;
+            height: 100%;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-cross me-2"></i>Face a Face com Deus
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Funcionalidades</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#install">Instalação</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://github.com/hidalgojunior/face-a-face-com-deus" target="_blank">
+                            <i class="fab fa-github me-1"></i>GitHub
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero-section">
+        <div class="container text-center">
+            <h1 class="display-4 fw-bold mb-4">
+                <i class="fas fa-heart me-3"></i>
+                Face a Face com Deus
+            </h1>
+            <p class="lead mb-4">
+                Sistema completo de gestão de eventos religiosos com player profissional, 
+                automação de pagamentos e cobertura espiritual.
+            </p>
+            <div class="row justify-content-center">
+                <div class="col-auto">
+                    <a href="https://github.com/hidalgojunior/face-a-face-com-deus" class="btn btn-light btn-lg me-3">
+                        <i class="fab fa-github me-2"></i>Ver no GitHub
+                    </a>
+                    <a href="#install" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-download me-2"></i>Instalar Agora
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">🚀 Principais Funcionalidades</h2>
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-music fa-3x text-primary"></i>
+                            </div>
+                            <h5 class="card-title">Player 4 Decks</h5>
+                            <p class="card-text">Sistema profissional com crossfaders, automix e suporte multi-formato.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-chart-line fa-3x text-success"></i>
+                            </div>
+                            <h5 class="card-title">Dashboard Pagamentos</h5>
+                            <p class="card-text">Automação completa com n8n, relatórios e notificações WhatsApp.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-praying-hands fa-3x text-warning"></i>
+                            </div>
+                            <h5 class="card-title">Cobertura Espiritual</h5>
+                            <p class="card-text">Gestão de ministração, escalas de intercessão e acompanhamento.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="fab fa-docker fa-3x text-info"></i>
+                            </div>
+                            <h5 class="card-title">Docker Completo</h5>
+                            <p class="card-text">Infraestrutura pronta com PHP, MySQL, Nginx e n8n.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="install" class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h2 class="mb-4">💻 Instalação Rápida</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <pre class="bg-dark text-light p-3 rounded"><code>git clone https://github.com/hidalgojunior/face-a-face-com-deus.git
+cd face-a-face-com-deus
+docker-compose up -d
+
+# Acesse: http://localhost/f2f/install-database.php</code></pre>
+                        </div>
+                    </div>
+                    <p class="mt-3 text-muted">
+                        Requer: Docker Desktop e Git instalados
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-primary text-white py-4">
+        <div class="container text-center">
+            <p class="mb-2">
+                <strong>Face a Face com Deus</strong> - Desenvolvido com ❤️ para a comunidade cristã
+            </p>
+            <p class="mb-0 text-light">
+                <em>"Porque onde estiverem dois ou três reunidos em meu nome, aí estou eu no meio deles." - Mateus 18:20</em>
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+"@
+
+# Salvar index.html
+$indexHtml | Out-File -FilePath "docs/index.html" -Encoding UTF8
+Write-Host "✅ docs/index.html criado" -ForegroundColor Green
+
+# Adicionar ao Git
+git add docs/
+git commit -m "📄 docs: Adiciona GitHub Pages com landing page profissional
+
+✨ Funcionalidades da página:
+- Design responsivo com Bootstrap 5
+- Seções: Hero, Funcionalidades, Instalação
+- Links para GitHub e documentação
+- Visual atrativo para comunidade cristã
+- Instruções de instalação clara
+
+🎯 Objetivo: Criar presença web profissional para o projeto"
+
+Write-Host "✅ Commit realizado" -ForegroundColor Green
+
+# Push para GitHub
+git push origin master
+Write-Host "✅ Enviado para GitHub" -ForegroundColor Green
+
+Write-Host "`n🔗 Próximos passos:" -ForegroundColor Yellow
+Write-Host "   1. Acesse: https://github.com/hidalgojunior/face-a-face-com-deus/settings/pages" -ForegroundColor Cyan
+Write-Host "   2. Em 'Source' selecione: 'Deploy from a branch'" -ForegroundColor Cyan  
+Write-Host "   3. Em 'Branch' selecione: 'master' e folder '/docs'" -ForegroundColor Cyan
+Write-Host "   4. Clique em 'Save'" -ForegroundColor Cyan
+Write-Host "   5. Aguarde alguns minutos e acesse:" -ForegroundColor Cyan
+Write-Host "      https://hidalgojunior.github.io/face-a-face-com-deus/" -ForegroundColor Green
