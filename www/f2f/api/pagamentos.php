@@ -13,7 +13,7 @@ header('Access-Control-Allow-Headers: Content-Type');
 $host = 'dev_mysql';
 $dbname = 'face_a_face';
 $username = 'root';
-$password = 'root123';
+$password = 'rootpassword';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
