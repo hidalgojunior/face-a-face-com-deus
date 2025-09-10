@@ -870,14 +870,29 @@
                         </div>
                     </div>
                     
-                    <div class="alert alert-info mt-3">
-                        <h6><i class="fas fa-lightbulb me-2"></i>Dicas para Uso:</h6>
-                        <ul class="mb-0">
-                            <li>Use arquivos MP3 ou WAV para melhor compatibilidade</li>
-                            <li>Clique em "Gerar Tom de Teste" primeiro para verificar o áudio</li>
-                            <li>Certifique-se de que o navegador permite reprodução de áudio</li>
-                            <li>Para usar em eventos, teste todas as funcionalidades antes</li>
-                        </ul>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-lightbulb me-2"></i>Dicas para Uso:</h6>
+                                <ul class="mb-0 small">
+                                    <li>Use arquivos MP3 ou WAV para melhor compatibilidade</li>
+                                    <li>Clique em "Gerar Tom de Teste" primeiro para verificar o áudio</li>
+                                    <li>Certifique-se de que o navegador permite reprodução de áudio</li>
+                                    <li>Para usar em eventos, teste todas as funcionalidades antes</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="alert alert-success">
+                                <h6><i class="fas fa-upload me-2"></i>Upload de Músicas:</h6>
+                                <ul class="mb-0 small">
+                                    <li><strong>Formatos aceitos:</strong> MP3, WAV, OGG, AAC, FLAC</li>
+                                    <li><strong>Nome do arquivo:</strong> "Artista - Título.mp3" (recomendado)</li>
+                                    <li><strong>Upload múltiplo:</strong> Selecione várias músicas de uma vez</li>
+                                    <li><strong>AutoMix:</strong> Configure intervalos e modo de reprodução</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -895,14 +910,23 @@
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="card">
-                                <div class="card-header d-flex justify-content-between align-items-center">
-                                    <h6><i class="fas fa-music me-2"></i>Lista de Músicas</h6>
-                                    <div>
-                                        <button class="btn btn-sm btn-success me-2" onclick="loadPlaylist()">
-                                            <i class="fas fa-download me-1"></i>Carregar Lista
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="mb-0"><i class="fas fa-music me-2"></i>Suas Músicas Personalizadas</h6>
+                                        <span class="badge bg-primary" id="playlistCount">0 músicas</span>
+                                    </div>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        <button class="btn btn-sm btn-warning" onclick="uploadMultipleFiles()">
+                                            <i class="fas fa-cloud-upload-alt me-1"></i>Upload Múltiplo
                                         </button>
-                                        <button class="btn btn-sm btn-primary" onclick="addToPlaylist()">
-                                            <i class="fas fa-plus me-1"></i>Adicionar
+                                        <button class="btn btn-sm btn-success" onclick="loadPlaylist()">
+                                            <i class="fas fa-refresh me-1"></i>Atualizar Lista
+                                        </button>
+                                        <button class="btn btn-sm btn-primary" onclick="addCustomTrack()">
+                                            <i class="fas fa-plus me-1"></i>Adicionar Manual
+                                        </button>
+                                        <button class="btn btn-sm btn-secondary" onclick="clearPlaylist()">
+                                            <i class="fas fa-trash me-1"></i>Limpar
                                         </button>
                                     </div>
                                 </div>
@@ -1306,112 +1330,50 @@
             let currentPlaylistIndex = 0;
             let currentDeck = 1;
 
-            // Lista de músicas para AutoMix (músicas cristãs populares)
-            let playlist = [
+            // Lista de músicas personalizada (inicialmente vazia)
+            let playlist = [];
+            
+            // Lista de músicas exemplo (opcional para demonstração)
+            let examplePlaylist = [
                 {
                     title: "Rude Cruz",
                     artist: "Hinário Adventista",
                     genre: "Hino",
                     duration: "4:30",
-                    url: "" // URL será preenchida quando o usuário carregar o arquivo
+                    url: "",
+                    isExample: true
                 },
                 {
-                    title: "Amazing Grace",
+                    title: "Amazing Grace", 
                     artist: "Traditional",
                     genre: "Hino",
                     duration: "4:15",
-                    url: ""
+                    url: "",
+                    isExample: true
                 },
                 {
                     title: "Como é Grande o Meu Deus",
                     artist: "Hillsong",
-                    genre: "Contemporary",
+                    genre: "Contemporary", 
                     duration: "5:20",
-                    url: ""
+                    url: "",
+                    isExample: true
                 },
                 {
                     title: "Oceanos",
                     artist: "Hillsong United",
                     genre: "Contemporary",
-                    duration: "6:45",
-                    url: ""
+                    duration: "6:45", 
+                    url: "",
+                    isExample: true
                 },
                 {
                     title: "Tua Graça me Basta",
                     artist: "Fernandinho",
                     genre: "Gospel",
                     duration: "4:50",
-                    url: ""
-                },
-                {
-                    title: "Jesus Cristo Basta",
-                    artist: "Aline Barros",
-                    genre: "Gospel",
-                    duration: "5:10",
-                    url: ""
-                },
-                {
-                    title: "Eu Me Rendo",
-                    artist: "Renascer Praise",
-                    genre: "Contemporary",
-                    duration: "5:30",
-                    url: ""
-                },
-                {
-                    title: "Deus de Promessas",
-                    artist: "Toque no Altar",
-                    genre: "Gospel",
-                    duration: "4:25",
-                    url: ""
-                },
-                {
-                    title: "Sonda-me, Usa-me",
-                    artist: "Aline Barros",
-                    genre: "Gospel",
-                    duration: "6:00",
-                    url: ""
-                },
-                {
-                    title: "Santo Santo Santo",
-                    artist: "Hinário Adventista",
-                    genre: "Hino",
-                    duration: "3:45",
-                    url: ""
-                },
-                {
-                    title: "Hosana",
-                    artist: "Gabriela Rocha",
-                    genre: "Contemporary",
-                    duration: "5:15",
-                    url: ""
-                },
-                {
-                    title: "Lugar Secreto",
-                    artist: "Gabriela Rocha",
-                    genre: "Contemporary",
-                    duration: "4:40",
-                    url: ""
-                },
-                {
-                    title: "Águas Purificadoras",
-                    artist: "Diante do Trono",
-                    genre: "Contemporary",
-                    duration: "5:55",
-                    url: ""
-                },
-                {
-                    title: "Espírito Enche a Minha Vida",
-                    artist: "Fernandinho",
-                    genre: "Gospel",
-                    duration: "4:35",
-                    url: ""
-                },
-                {
-                    title: "Bondade de Deus",
-                    artist: "Isaías Saad",
-                    genre: "Contemporary",
-                    duration: "5:25",
-                    url: ""
+                    url: "",
+                    isExample: true
                 }
             ];
 
@@ -1534,11 +1496,31 @@
             const container = document.getElementById('playlistContainer');
             if (!container) return;
 
+            if (playlist.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="fas fa-music fa-3x text-muted mb-3"></i>
+                        <h6 class="text-muted">Sua playlist está vazia</h6>
+                        <p class="text-muted small mb-3">Adicione suas músicas favoritas para começar</p>
+                        <div class="d-flex flex-column gap-2">
+                            <button class="btn btn-primary btn-sm" onclick="uploadMultipleFiles()">
+                                <i class="fas fa-cloud-upload-alt me-2"></i>Upload de Músicas
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm" onclick="loadExamplePlaylist()">
+                                <i class="fas fa-list me-2"></i>Carregar Lista de Exemplo
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
             let html = '';
             playlist.forEach((track, index) => {
                 const isLoaded = track.url && track.url !== '';
                 const statusClass = isLoaded ? 'text-success' : 'text-muted';
                 const statusIcon = isLoaded ? 'fas fa-check-circle' : 'fas fa-circle';
+                const isExample = track.isExample ? '<span class="badge bg-info ms-2">Exemplo</span>' : '';
                 
                 html += `
                     <div class="playlist-item mb-2 p-2 border rounded ${index === currentPlaylistIndex ? 'bg-light' : ''}">
@@ -1548,17 +1530,21 @@
                                     <i class="${statusIcon} ${statusClass} me-2"></i>
                                     <strong>${track.title}</strong>
                                     ${index === currentPlaylistIndex ? '<span class="badge bg-primary ms-2">Atual</span>' : ''}
+                                    ${isExample}
                                 </div>
                                 <small class="text-muted d-block">
                                     ${track.artist} • ${track.genre} • ${track.duration}
                                 </small>
                             </div>
                             <div class="btn-group btn-group-sm">
-                                <button class="btn btn-outline-primary btn-sm" onclick="loadTrackToPlaylist(${index})">
+                                <button class="btn btn-outline-primary btn-sm" onclick="loadTrackToPlaylist(${index})" title="Carregar arquivo de áudio">
                                     <i class="fas fa-upload"></i>
                                 </button>
-                                <button class="btn btn-outline-success btn-sm" onclick="playTrackFromPlaylist(${index})">
+                                <button class="btn btn-outline-success btn-sm" onclick="playTrackFromPlaylist(${index})" ${!isLoaded ? 'disabled' : ''} title="Reproduzir música">
                                     <i class="fas fa-play"></i>
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm" onclick="removeFromPlaylist(${index})" title="Remover da playlist">
+                                    <i class="fas fa-trash"></i>
                                 </button>
                             </div>
                         </div>
@@ -1567,22 +1553,154 @@
             });
             
             container.innerHTML = html;
+            
+            // Atualizar contador de músicas
+            updatePlaylistCount();
         }
 
-        function addToPlaylist() {
-            const title = prompt('Nome da música:');
-            const artist = prompt('Artista:');
+        function updatePlaylistCount() {
+            const countElement = document.getElementById('playlistCount');
+            if (countElement) {
+                const loadedCount = playlist.filter(track => track.url).length;
+                const totalCount = playlist.length;
+                
+                if (totalCount === 0) {
+                    countElement.textContent = 'Vazia';
+                    countElement.className = 'badge bg-secondary';
+                } else if (loadedCount === totalCount) {
+                    countElement.textContent = `${totalCount} música${totalCount > 1 ? 's' : ''} (todas prontas)`;
+                    countElement.className = 'badge bg-success';
+                } else {
+                    countElement.textContent = `${loadedCount}/${totalCount} música${totalCount > 1 ? 's' : ''} carregada${loadedCount !== 1 ? 's' : ''}`;
+                    countElement.className = 'badge bg-warning';
+                }
+            }
+        }
+
+        function uploadMultipleFiles() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'audio/*';
+            input.multiple = true;
             
-            if (title && artist) {
-                playlist.push({
-                    title: title,
-                    artist: artist,
-                    genre: 'Custom',
-                    duration: '0:00',
-                    url: ''
+            input.onchange = function(e) {
+                const files = Array.from(e.target.files);
+                let successCount = 0;
+                
+                if (files.length === 0) return;
+                
+                files.forEach((file, index) => {
+                    if (file.type.startsWith('audio/')) {
+                        // Extrair informações do arquivo
+                        const fileName = file.name.replace(/\.[^/.]+$/, ""); // Remove extensão
+                        const parts = fileName.split(' - ');
+                        
+                        let title, artist;
+                        if (parts.length >= 2) {
+                            artist = parts[0].trim();
+                            title = parts[1].trim();
+                        } else {
+                            title = fileName;
+                            artist = 'Artista Desconhecido';
+                        }
+                        
+                        const url = URL.createObjectURL(file);
+                        
+                        // Criar entrada na playlist
+                        const trackData = {
+                            title: title,
+                            artist: artist,
+                            genre: 'Sua Música',
+                            duration: '0:00',
+                            url: url,
+                            file: file,
+                            isExample: false
+                        };
+                        
+                        playlist.push(trackData);
+                        successCount++;
+                        
+                        // Tentar obter duração do arquivo
+                        const audio = new Audio(url);
+                        audio.addEventListener('loadedmetadata', () => {
+                            const minutes = Math.floor(audio.duration / 60);
+                            const seconds = Math.floor(audio.duration % 60);
+                            trackData.duration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                            renderPlaylist();
+                        });
+                    }
                 });
+                
+                setTimeout(() => {
+                    renderPlaylist();
+                    alert(`✅ ${successCount} música(s) adicionada(s) com sucesso!`);
+                    console.log(`Adicionadas ${successCount} músicas à playlist`);
+                }, 100);
+            };
+            
+            input.click();
+        }
+
+        function addCustomTrack() {
+            const title = prompt('Nome da música:');
+            if (!title) return;
+            
+            const artist = prompt('Nome do artista:') || 'Artista Desconhecido';
+            const genre = prompt('Gênero musical:') || 'Personalizado';
+            
+            playlist.push({
+                title: title,
+                artist: artist,
+                genre: genre,
+                duration: '0:00',
+                url: '',
+                isExample: false
+            });
+            
+            renderPlaylist();
+            console.log('Música adicionada manualmente:', title, 'por', artist);
+        }
+
+        function loadExamplePlaylist() {
+            if (confirm('Deseja carregar uma playlist de exemplo com músicas cristãs populares?')) {
+                playlist = [...examplePlaylist];
                 renderPlaylist();
-                console.log('Música adicionada à playlist:', title, 'por', artist);
+                alert('✅ Playlist de exemplo carregada! Use os botões de upload para adicionar os arquivos de áudio.');
+            }
+        }
+
+        function clearPlaylist() {
+            if (confirm('Tem certeza que deseja limpar toda a playlist?')) {
+                // Limpar URLs para liberar memória
+                playlist.forEach(track => {
+                    if (track.url && !track.isExample) {
+                        URL.revokeObjectURL(track.url);
+                    }
+                });
+                playlist = [];
+                currentPlaylistIndex = 0;
+                renderPlaylist();
+                updateAutoMixStatus();
+                alert('✅ Playlist limpa com sucesso!');
+            }
+        }
+
+        function removeFromPlaylist(index) {
+            if (confirm(`Remover "${playlist[index].title}" da playlist?`)) {
+                // Liberar URL da memória
+                if (playlist[index].url && !playlist[index].isExample) {
+                    URL.revokeObjectURL(playlist[index].url);
+                }
+                
+                playlist.splice(index, 1);
+                
+                // Ajustar índice atual se necessário
+                if (currentPlaylistIndex >= index) {
+                    currentPlaylistIndex = Math.max(0, currentPlaylistIndex - 1);
+                }
+                
+                renderPlaylist();
+                updateAutoMixStatus();
             }
         }
 
