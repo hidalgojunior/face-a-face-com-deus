@@ -1,0 +1,183 @@
+services:
+  # Servidor Web Nginx com SSL
+  webserver:
+    image: nginx:alpine
+    container_name: dev_webserver
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx-simple.conf:/etc/nginx/nginx.conf
+      - ./nginx/sites:/etc/nginx/sites-available
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./www:/var/www/html
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - php
+    networks:
+      - dev-network
+
+  # PHP-FPM
+  php:
+    build: ./php
+    container_name: dev_php
+    restart: unless-stopped
+    volumes:
+      - ./www:/var/www/html
+      - ./php/php.ini:/usr/local/etc/php/php.ini
+    networks:
+      - dev-network
+
+  # n8n - Automação de Workflows
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: dev_n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=admin123
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=http://localhost:5678/
+      - GENERIC_TIMEZONE=America/Sao_Paulo
+    volumes:
+      - ./n8n/data:/home/node/.n8n
+      - ./n8n/workflows:/home/node/workflows
+    networks:
+      - dev-network
+
+  # MySQL
+  mysql:
+    image: mysql:8.0
+    container_name: dev_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: devdb
+      MYSQL_USER: devuser
+      MYSQL_PASSWORD: devpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    networks:
+      - dev-network
+
+  # phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: dev_phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: rootpassword
+      UPLOAD_LIMIT: 100M
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    networks:
+      - dev-network
+
+  # PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: dev_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: devdb
+      POSTGRES_USER: devuser
+      POSTGRES_PASSWORD: devpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    networks:
+      - dev-network
+
+  # pgAdmin (Interface gráfica para PostgreSQL)
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: dev_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: adminpassword
+    ports:
+      - "8081:80"
+    depends_on:
+      - postgres
+    networks:
+      - dev-network
+
+  # Python Development Environment
+  python:
+    build: ./python
+    container_name: dev_python
+    restart: unless-stopped
+    volumes:
+      - ./python/projects:/app
+      - ./www:/var/www/html
+    ports:
+      - "8000:8000"
+      - "5000:5000"
+    working_dir: /app
+    command: tail -f /dev/null
+    networks:
+      - dev-network
+
+  # FTP Server
+  ftp:
+    image: delfer/alpine-ftp-server
+    container_name: dev_ftp
+    restart: unless-stopped
+    environment:
+      USERS: "devuser|devpassword|/ftp/devuser"
+      ADDRESS: ftp
+    ports:
+      - "21:21"
+      - "21000-21010:21000-21010"
+    volumes:
+      - ./ftp:/ftp
+      - ./www:/ftp/devuser/www
+    networks:
+      - dev-network
+
+  # Interface gráfica para FTP (FileManager)
+  filemanager:
+    image: filebrowser/filebrowser
+    container_name: dev_filemanager
+    restart: unless-stopped
+    ports:
+      - "8083:80"
+    volumes:
+      - ./ftp:/srv
+      - ./filemanager/database:/database
+      - ./filemanager/settings.json:/config/settings.json
+    command: --config /config/settings.json
+    networks:
+      - dev-network
+
+volumes:
+  mysql_data:
+  postgres_data:
+
+networks:
+  dev-network:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_icc: "true"
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+      com.docker.network.driver.mtu: "1500"
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1

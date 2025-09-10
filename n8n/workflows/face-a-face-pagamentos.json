@@ -1,0 +1,260 @@
+{
+  "name": "Face a Face - Sistema de Pagamentos",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {
+        "path": "pagamento-lembrete",
+        "options": {}
+      },
+      "name": "Webhook - Lembrete Pagamento",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "pagamento-lembrete"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.telefone }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "name": "Tem WhatsApp?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://api.whatsapp.com/send",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer SEU_TOKEN_WHATSAPP"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $json.telefone }}"
+            },
+            {
+              "name": "message",
+              "value": "🙏 Olá {{ $json.nome }}!\n\nEste é um lembrete do Face a Face com Deus:\n💰 Valor devido: R$ {{ $json.valor_devido }}\n📅 Vencimento: {{ $json.data_vencimento }}\n\nContamos com você! 🔥\n\n_Mensagem automática do sistema_"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Enviar WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [680, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.email }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "name": "Tem Email?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [680, 400]
+    },
+    {
+      "parameters": {
+        "fromEmail": "sistema@facefacecomdeus.com",
+        "toEmail": "={{ $json.email }}",
+        "subject": "Face a Face - Lembrete de Pagamento 💰",
+        "emailFormat": "html",
+        "message": "<!DOCTYPE html>\n<html>\n<head>\n    <style>\n        body { font-family: Arial, sans-serif; background-color: #f4f4f4; }\n        .container { max-width: 600px; margin: 0 auto; background-color: white; padding: 20px; }\n        .header { background-color: #007bff; color: white; padding: 20px; text-align: center; }\n        .content { padding: 20px; }\n        .highlight { background-color: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; }\n        .footer { text-align: center; color: #666; font-size: 12px; }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"header\">\n            <h1>🙏 Face a Face com Deus</h1>\n        </div>\n        <div class=\"content\">\n            <p>Olá <strong>{{ $json.nome }}</strong>,</p>\n            \n            <p>Este é um lembrete sobre o seu pagamento do <strong>{{ $json.evento_nome }}</strong>:</p>\n            \n            <div class=\"highlight\">\n                <strong>💰 Valor devido:</strong> R$ {{ $json.valor_devido }}<br>\n                <strong>📅 Vencimento:</strong> {{ $json.data_vencimento }}<br>\n                <strong>👤 Tipo:</strong> {{ $json.tipo_pessoa }}\n            </div>\n            \n            <p>Para realizar o pagamento, entre em contato conosco ou utilize os dados bancários enviados anteriormente.</p>\n            \n            <p>Contamos com a sua participação! 🔥</p>\n            \n            <p><em>Deus abençoe!</em></p>\n        </div>\n        <div class=\"footer\">\n            <p>Esta é uma mensagem automática do sistema Face a Face com Deus</p>\n        </div>\n    </div>\n</body>\n</html>",
+        "options": {}
+      },
+      "name": "Enviar Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [900, 400]
+    },
+    {
+      "parameters": {
+        "url": "http://dev_webserver/f2f/api/pagamentos.php/log-mensagem",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "destinatario_tipo",
+              "value": "={{ $json.tipo_pessoa }}"
+            },
+            {
+              "name": "destinatario_id",
+              "value": "={{ $json.id }}"
+            },
+            {
+              "name": "tipo_mensagem",
+              "value": "pagamento_pendente"
+            },
+            {
+              "name": "canal",
+              "value": "whatsapp"
+            },
+            {
+              "name": "numero_telefone",
+              "value": "={{ $json.telefone }}"
+            },
+            {
+              "name": "status_envio",
+              "value": "enviado"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Log WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "url": "http://dev_webserver/f2f/api/pagamentos.php/log-mensagem",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "destinatario_tipo",
+              "value": "={{ $json.tipo_pessoa }}"
+            },
+            {
+              "name": "destinatario_id",
+              "value": "={{ $json.id }}"
+            },
+            {
+              "name": "tipo_mensagem",
+              "value": "pagamento_pendente"
+            },
+            {
+              "name": "canal",
+              "value": "email"
+            },
+            {
+              "name": "email_destinatario",
+              "value": "={{ $json.email }}"
+            },
+            {
+              "name": "status_envio",
+              "value": "enviado"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Log Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1120, 400]
+    }
+  ],
+  "connections": {
+    "Webhook - Lembrete Pagamento": {
+      "main": [
+        [
+          {
+            "node": "Tem WhatsApp?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tem WhatsApp?": {
+      "main": [
+        [
+          {
+            "node": "Enviar WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Tem Email?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Log WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tem Email?": {
+      "main": [
+        [
+          {
+            "node": "Enviar Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Email": {
+      "main": [
+        [
+          {
+            "node": "Log Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-09-10T00:00:00.000Z",
+  "updatedAt": "2025-09-10T00:00:00.000Z",
+  "settings": {}
+}

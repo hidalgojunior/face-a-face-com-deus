@@ -1,0 +1,38 @@
+# Arquivos e pastas do Docker
+mysql-data/
+postgres-data/
+logs/
+n8n/data/
+
+# Certificados SSL
+nginx/ssl/*.key
+nginx/ssl/*.crt
+nginx/ssl/*.pem
+
+# Arquivos temporários
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+
+# Configurações sensíveis
+.env
+*.env.local
+*.env.production
+
+# Arquivos de backup
+*.bak
+*.backup
+*.sql.gz
+
+# Node modules (se houver)
+node_modules/
+
+# Cache do PHP
+*.cache
+
+# Arquivos de sessão
+sessions/
+
+# Uploads temporários
+uploads/tmp/

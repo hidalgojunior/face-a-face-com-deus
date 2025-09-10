@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 DevServer Pro - Ambiente de Desenvolvimento</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --dark-gradient: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.8);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 12px 48px rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: var(--primary-gradient);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+            z-index: -1;
+            animation: floatBg 20s ease-in-out infinite;
+        }
+
+        @keyframes floatBg {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(1deg); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 1000;
+            padding: 1rem 2rem;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .navbar .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-gradient);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .hero {
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .hero .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin: 4rem 0;
+        }
+
+        .service-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .service-card:nth-child(even) {
+            animation-delay: 0.1s;
+        }
+
+        .service-card:nth-child(odd) {
+            animation-delay: 0.2s;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--secondary-gradient);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .service-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .service-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .service-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .service-card .description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            background: #fff;
+            border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .service-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .service-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .service-btn:hover::before {
+            left: 100%;
+        }
+
+        .service-btn:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .credentials {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        .credentials-title {
+            font-weight: 600;
+            color: #fbbf24;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .credential-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.25rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .credential-item:last-child {
+            border-bottom: none;
+        }
+
+        .credential-label {
+            color: var(--text-secondary);
+        }
+
+        .credential-value {
+            color: var(--text-primary);
+            font-weight: 500;
+            font-family: 'Courier New', monospace;
+        }
+
+        .info-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 3rem;
+            margin: 4rem 0;
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+
+        .info-section h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .connection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .connection-card {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .connection-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .connection-card h4 {
+            color: #60a5fa;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .utility-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .utility-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: var(--dark-gradient);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .utility-btn:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-secondary);
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero {
+                padding: 6rem 1rem 3rem;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                margin: 2rem 0;
+            }
+
+            .service-card {
+                padding: 1.5rem;
+            }
+
+            .connection-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .utility-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        .hosting-panel-highlight {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hosting-panel-highlight::after {
+            content: '⭐ NOVO';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: #000;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            animation: pulse 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-server"></i> DevServer Pro
+            </div>
+            <ul class="nav-links">
+                <li><a href="#services">Serviços</a></li>
+                <li><a href="#connections">Conexões</a></li>
+                <li><a href="/hosting-panel/" target="_blank">Hosting Panel</a></li>
+                <li><a href="#about">Sobre</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>🚀 Ambiente de Desenvolvimento Completo</h1>
+            <p class="subtitle">
+                Plataforma integrada com todos os serviços necessários para desenvolvimento web moderno. 
+                PHP, MySQL, PostgreSQL, Python e muito mais em um ambiente Docker otimizado.
+            </p>
+        </div>
+    </section>
+
+    <!-- Services Grid -->
+    <section id="services" class="container">
+        <div class="services-grid">
+            <!-- Hosting Panel - Destaque -->
+            <div class="service-card hosting-panel-highlight">
+                <div class="service-icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <h3>🎯 HostPanel Pro</h3>
+                <p class="description">Sistema completo de gerenciamento de hospedagem com interface profissional e recursos avançados</p>
+                <div class="status-badge">
+                    <div class="status-indicator"></div>
+                    <span>Sistema Premium</span>
+                </div>
+                <div class="service-links">
+                    <a href="/hosting-panel/" target="_blank" class="service-btn">
+                        <i class="fas fa-external-link-alt"></i>
+                        Acessar Painel
+                    </a>
+                </div>
+                <div class="credentials">
+                    <div class="credentials-title">🎪 Demo Disponível</div>
+                    <div class="credential-item">
+                        <span class="credential-label">Acesso:</span>
+                        <span class="credential-value">Cadastro Livre</span>
+                    </div>
+                    <div class="credential-item">
+                        <span class="credential-label">Recursos:</span>
+                        <span class="credential-value">Completos</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Servidor Web -->
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-server"></i>
+                </div>
+                <h3>🌐 Servidor Web</h3>
+                <p class="description">Nginx otimizado com suporte completo para SSL/TLS e configurações avançadas</p>
+                <div class="status-badge">
+                    <div class="status-indicator"></div>
+                    <span>Online</span>
+                </div>
+                <div class="service-links">
+                    <a href="https://localhost" target="_blank" class="service-btn">
+                        <i class="fas fa-lock"></i>
+                        HTTPS Site
+                    </a>
+                    <a href="http://localhost" target="_blank" class="service-btn">
+                        <i class="fas fa-globe"></i>
+                        HTTP Site
+                    </a>
+                </div>
+            </div>
+
+            <!-- phpMyAdmin -->
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <h3>🗄️ phpMyAdmin</h3>
+                <p class="description">Interface web completa para gerenciamento de bancos de dados MySQL</p>
+                <div class="status-badge">
+                    <div class="status-indicator"></div>
+                    <span>Online</span>
+                </div>
+                <div class="service-links">
+                    <a href="http://localhost:8080" target="_blank" class="service-btn">
+                        <i class="fas fa-external-link-alt"></i>
+                        Acessar Interface
+                    </a>
+                </div>
+                <div class="credentials">
+                    <div class="credentials-title">🔑 Credenciais MySQL</div>
+                    <div class="credential-item">
+                        <span class="credential-label">Usuário:</span>
+                        <span class="credential-value">root</span>
+                    </div>
+                    <div class="credential-item">
+                        <span class="credential-label">Senha:</span>
+                        <span class="credential-value">rootpassword</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- pgAdmin -->
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fab fa-postgresql"></i>
+                </div>
+                <h3>🐘 pgAdmin</h3>
+                <p class="description">Ferramenta avançada de administração para bancos de dados PostgreSQL</p>
+                <div class="status-badge">
+                    <div class="status-indicator"></div>
+                    <span>Online</span>
+                </div>
+                <div class="service-links">
+                    <a href="http://localhost:8081" target="_blank" class="service-btn">
+                        <i class="fas fa-external-link-alt"></i>
+                        Acessar pgAdmin
+                    </a>
+                </div>
+                <div class="credentials">
+                    <div class="credentials-title">🔑 Credenciais PostgreSQL</div>
+                    <div class="credential-item">
+                        <span class="credential-label">Email:</span>
+                        <span class="credential-value">admin@dev.local</span>
+                    </div>
+                    <div class="credential-item">
+                        <span class="credential-label">Senha:</span>
+                        <span class="credential-value">adminpassword</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- File Manager -->
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-folder-open"></i>
+                </div>
+                <h3>📁 Gerenciador de Arquivos</h3>
+                <p class="description">Interface web moderna para gerenciamento de arquivos com suporte FTP integrado</p>
+                <div class="status-badge">
+                    <div class="status-indicator"></div>
+                    <span>Online</span>
+                </div>
+                <div class="service-links">
+                    <a href="http://localhost:8083" target="_blank" class="service-btn">
+                        <i class="fas fa-external-link-alt"></i>
+                        File Manager
+                    </a>
+                </div>
+                <div class="credentials">
+                    <div class="credentials-title">🔑 Credenciais FTP</div>
+                    <div class="credential-item">
+                        <span class="credential-label">Usuário:</span>
+                        <span class="credential-value">admin</span>
+                    </div>
+                    <div class="credential-item">
+                        <span class="credential-label">Senha:</span>
+                        <span class="credential-value">admin</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Python Apps -->
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fab fa-python"></i>
+                </div>
+                <h3>🐍 Python Server</h3>
+                <p class="description">Ambiente Python 3.11 pronto para Django, Flask, FastAPI e outras frameworks</p>
+                <div class="status-badge">
+                    <div class="status-indicator"></div>
+                    <span>Disponível</span>
+                </div>
+                <div class="service-links">
+                    <a href="http://localhost:8000" target="_blank" class="service-btn">
+                        <i class="fas fa-external-link-alt"></i>
+                        Python Server
+                    </a>
+                </div>
+                <div class="credentials">
+                    <div class="credentials-title">🐍 Python Environment</div>
+                    <div class="credential-item">
+                        <span class="credential-label">Versão:</span>
+                        <span class="credential-value">Python 3.11</span>
+                    </div>
+                    <div class="credential-item">
+                        <span class="credential-label">Porta:</span>
+                        <span class="credential-value">8000</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Connection Information -->
+    <section id="connections" class="container">
+        <div class="info-section">
+            <h2>📋 Informações de Conexão</h2>
+            
+            <div class="connection-grid">
+                <div class="connection-card">
+                    <h4><i class="fas fa-database"></i> MySQL Database</h4>
+                    <div class="credentials">
+                        <div class="credential-item">
+                            <span class="credential-label">Host:</span>
+                            <span class="credential-value">localhost:3306</span>
+                        </div>
+                        <div class="credential-item">
+                            <span class="credential-label">Database:</span>
+                            <span class="credential-value">devdb</span>
+                        </div>
+                        <div class="credential-item">
+                            <span class="credential-label">Usuário:</span>
+                            <span class="credential-value">devuser</span>
+                        </div>
+                        <div class="credential-item">
+                            <span class="credential-label">Senha:</span>
+                            <span class="credential-value">devpassword</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="connection-card">
+                    <h4><i class="fab fa-postgresql"></i> PostgreSQL Database</h4>
+                    <div class="credentials">
+                        <div class="credential-item">
+                            <span class="credential-label">Host:</span>
+                            <span class="credential-value">localhost:5432</span>
+                        </div>
+                        <div class="credential-item">
+                            <span class="credential-label">Database:</span>
+                            <span class="credential-value">devdb</span>
+                        </div>
+                        <div class="credential-item">
+                            <span class="credential-label">Usuário:</span>
+                            <span class="credential-value">devuser</span>
+                        </div>
+                        <div class="credential-item">
+                            <span class="credential-label">Senha:</span>
+                            <span class="credential-value">devpassword</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="connection-card">
+                    <h4><i class="fas fa-server"></i> FTP Server</h4>
+                    <div class="credentials">
+                        <div class="credential-item">
+                            <span class="credential-label">Host:</span>
+                            <span class="credential-value">localhost:21</span>
+                        </div>
+                        <div class="credential-item">
+                            <span class="credential-label">Usuário:</span>
+                            <span class="credential-value">devuser</span>
+                        </div>
+                        <div class="credential-item">
+                            <span class="credential-label">Senha:</span>
+                            <span class="credential-value">devpassword</span>
+                        </div>
+                        <div class="credential-item">
+                            <span class="credential-label">Modo:</span>
+                            <span class="credential-value">Passivo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="utility-buttons">
+                <a href="/info.php" target="_blank" class="utility-btn">
+                    <i class="fab fa-php"></i>
+                    PHP Info
+                </a>
+                <a href="/test-connections.php" target="_blank" class="utility-btn">
+                    <i class="fas fa-network-wired"></i>
+                    Testar Conexões
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" id="about">
+        <div class="container">
+            <h3>🚀 DevServer Pro</h3>
+            <p>Ambiente de desenvolvimento completo e profissional para projetos web modernos</p>
+            
+            <div class="footer-links">
+                <a href="/hosting-panel/" target="_blank">HostPanel Pro</a>
+                <a href="#services">Serviços</a>
+                <a href="#connections">Conexões</a>
+                <a href="/info.php" target="_blank">PHP Info</a>
+            </div>
+            
+            <p>&copy; 2025 DevServer Pro - Ambiente de Desenvolvimento Integrado</p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add animation delay to service cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.service-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+
+        // Status indicators animation
+        const indicators = document.querySelectorAll('.status-indicator');
+        indicators.forEach(indicator => {
+            setInterval(() => {
+                indicator.style.opacity = indicator.style.opacity === '0.5' ? '1' : '0.5';
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

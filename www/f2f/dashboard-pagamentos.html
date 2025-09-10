@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face a Face - Dashboard de Pagamentos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .dashboard-card {
+            transition: transform 0.2s;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+        }
+        .status-badge {
+            font-size: 0.75em;
+        }
+        .btn-n8n {
+            background: linear-gradient(45deg, #EA4B71, #7367F0);
+            border: none;
+            color: white;
+        }
+        .btn-n8n:hover {
+            background: linear-gradient(45deg, #d63384, #6f42c1);
+            color: white;
+        }
+        #notifications {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+            max-width: 400px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Notificações -->
+    <div id="notifications"></div>
+
+    <div class="container-fluid py-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="h2 mb-0">🙏 Face a Face com Deus</h1>
+                        <p class="text-muted">Dashboard de Pagamentos & Automação</p>
+                    </div>
+                    <div>
+                        <a href="http://localhost:5678" target="_blank" class="btn btn-n8n me-2">
+                            <i class="fas fa-robot"></i> Acessar n8n
+                        </a>
+                        <button class="btn btn-primary" onclick="atualizarDashboard()">
+                            <i class="fas fa-sync-alt"></i> Atualizar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cards de Resumo -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card dashboard-card bg-success text-white h-100">
+                    <div class="card-body text-center">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h5 class="card-title">💰 Total Arrecadado</h5>
+                                <h2 class="mb-0" id="total-arrecadado">R$ 0,00</h2>
+                                <small>Encontristas + Encontreiros</small>
+                            </div>
+                            <i class="fas fa-coins fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card dashboard-card bg-warning text-dark h-100">
+                    <div class="card-body text-center">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h5 class="card-title">⏳ Pendentes</h5>
+                                <h2 class="mb-0" id="total-pendente">R$ 0,00</h2>
+                                <small><span id="qtd-pendentes">0</span> pessoas</small>
+                            </div>
+                            <i class="fas fa-clock fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card dashboard-card bg-danger text-white h-100">
+                    <div class="card-body text-center">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h5 class="card-title">🚨 Atrasados</h5>
+                                <h2 class="mb-0" id="total-atrasado">R$ 0,00</h2>
+                                <small><span id="qtd-atrasados">0</span> pessoas</small>
+                            </div>
+                            <i class="fas fa-exclamation-triangle fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card dashboard-card bg-info text-white h-100">
+                    <div class="card-body text-center">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h5 class="card-title">📱 Mensagens Hoje</h5>
+                                <h2 class="mb-0" id="mensagens-enviadas">0</h2>
+                                <small>WhatsApp + Email + SMS</small>
+                            </div>
+                            <i class="fas fa-paper-plane fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controles de Automação -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">🤖 Automação de Mensagens via n8n</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <button class="btn btn-primary w-100 h-100" onclick="enviarLembretesPagamento()">
+                                    <i class="fas fa-envelope mb-2 d-block fa-2x"></i>
+                                    <strong>📨 Enviar Lembretes de Pagamento</strong>
+                                    <br><small class="text-light">Para quem está com pagamento pendente</small>
+                                </button>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <button class="btn btn-success w-100 h-100" onclick="enviarBoasVindas()">
+                                    <i class="fas fa-hand-wave mb-2 d-block fa-2x"></i>
+                                    <strong>👋 Enviar Boas-vindas</strong>
+                                    <br><small class="text-light">Para novos inscritos confirmados</small>
+                                </button>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <button class="btn btn-info w-100 h-100" onclick="enviarLembreteEvento()">
+                                    <i class="fas fa-calendar mb-2 d-block fa-2x"></i>
+                                    <strong>📅 Lembrete do Evento</strong>
+                                    <br><small class="text-light">1 semana antes do encontro</small>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="row g-3 mt-3">
+                            <div class="col-md-6">
+                                <button class="btn btn-outline-secondary w-100" onclick="testarN8N()">
+                                    <i class="fas fa-vial"></i> Testar Conexão n8n
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-outline-info w-100" onclick="verLogMensagens()">
+                                    <i class="fas fa-history"></i> Ver Log de Mensagens
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Pagamentos -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">💳 Controle de Pagamentos</h5>
+                        <div>
+                            <button class="btn btn-sm btn-outline-success" onclick="exportarPagamentos()">
+                                <i class="fas fa-download"></i> Exportar Relatório
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary" onclick="atualizarStatusPagamentos()">
+                                <i class="fas fa-sync-alt"></i> Atualizar Status
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover" id="tabela-pagamentos">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Tipo</th>
+                                        <th>Valor Devido</th>
+                                        <th>Valor Pago</th>
+                                        <th>Status</th>
+                                        <th>Vencimento</th>
+                                        <th>Última Mensagem</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lista-pagamentos">
+                                    <tr>
+                                        <td colspan="8" class="text-center text-muted">
+                                            <i class="fas fa-spinner fa-spin me-2"></i>
+                                            Carregando dados...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Gestor de Pagamentos -->
+    <script>
+        class GestorPagamentosN8N {
+            constructor() {
+                this.baseUrlN8N = 'http://localhost:5678';
+                this.webhooks = {
+                    pagamento: '/webhook/pagamento-lembrete',
+                    boasVindas: '/webhook/boas-vindas',
+                    lembreteEvento: '/webhook/lembrete-evento'
+                };
+                this.init();
+            }
+
+            async init() {
+                await this.carregarDashboard();
+                await this.carregarPagamentos();
+                
+                // Atualizar a cada 30 segundos
+                setInterval(() => {
+                    this.carregarDashboard();
+                }, 30000);
+            }
+
+            async carregarDashboard() {
+                try {
+                    const response = await fetch('/f2f/api/pagamentos.php/dashboard-pagamentos');
+                    const data = await response.json();
+                    
+                    document.getElementById('total-arrecadado').textContent = 'R$ ' + data.total_arrecadado;
+                    document.getElementById('total-pendente').textContent = 'R$ ' + data.total_pendente;
+                    document.getElementById('qtd-pendentes').textContent = data.qtd_pendentes;
+                    document.getElementById('total-atrasado').textContent = 'R$ ' + data.total_atrasado;
+                    document.getElementById('qtd-atrasados').textContent = data.qtd_atrasados;
+                    document.getElementById('mensagens-enviadas').textContent = data.mensagens_hoje;
+                } catch (error) {
+                    console.error('Erro ao carregar dashboard:', error);
+                }
+            }
+
+            async carregarPagamentos() {
+                try {
+                    const response = await fetch('/f2f/api/pagamentos.php/pagamentos-pendentes');
+                    const pagamentos = await response.json();
+                    
+                    const tbody = document.getElementById('lista-pagamentos');
+                    tbody.innerHTML = '';
+                    
+                    if (pagamentos.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Nenhum pagamento pendente encontrado</td></tr>';
+                        return;
+                    }
+                    
+                    pagamentos.forEach(pagamento => {
+                        const tr = document.createElement('tr');
+                        
+                        const statusClass = this.getStatusClass(pagamento.status_pagamento || 'pendente');
+                        const valorDevido = parseFloat(pagamento.valor_devido);
+                        const valorPago = parseFloat(pagamento.valor_pago || 0);
+                        const valorRestante = valorDevido - valorPago;
+                        
+                        tr.innerHTML = `
+                            <td>${pagamento.nome}</td>
+                            <td>
+                                <span class="badge ${pagamento.tipo_pessoa === 'encontrista' ? 'bg-primary' : 'bg-secondary'}">
+                                    ${pagamento.tipo_pessoa === 'encontrista' ? '🎯 Encontrista' : '👷‍♂️ Encontreiro'}
+                                </span>
+                            </td>
+                            <td>R$ ${valorDevido.toFixed(2).replace('.', ',')}</td>
+                            <td>R$ ${valorPago.toFixed(2).replace('.', ',')}</td>
+                            <td><span class="badge ${statusClass}">${this.getStatusText(pagamento.status_pagamento || 'pendente')}</span></td>
+                            <td>${this.formatarData(pagamento.data_vencimento)}</td>
+                            <td><small class="text-muted">-</small></td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-success" onclick="confirmarPagamento(${pagamento.id}, '${pagamento.tipo_pessoa}')">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-outline-primary" onclick="enviarLembrete(${pagamento.id})">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                        
+                        tbody.appendChild(tr);
+                    });
+                } catch (error) {
+                    console.error('Erro ao carregar pagamentos:', error);
+                }
+            }
+
+            getStatusClass(status) {
+                const classes = {
+                    'pendente': 'bg-warning',
+                    'parcial': 'bg-info',
+                    'pago': 'bg-success',
+                    'atrasado': 'bg-danger',
+                    'cancelado': 'bg-secondary'
+                };
+                return classes[status] || 'bg-warning';
+            }
+
+            getStatusText(status) {
+                const texts = {
+                    'pendente': 'Pendente',
+                    'parcial': 'Parcial',
+                    'pago': 'Pago',
+                    'atrasado': 'Atrasado',
+                    'cancelado': 'Cancelado'
+                };
+                return texts[status] || 'Pendente';
+            }
+
+            formatarData(data) {
+                if (!data) return '-';
+                return new Date(data).toLocaleDateString('pt-BR');
+            }
+
+            async enviarLembretesPagamento() {
+                try {
+                    this.showLoading('Enviando lembretes...');
+                    
+                    const response = await fetch('/f2f/api/pagamentos.php/pagamentos-pendentes');
+                    const pendentes = await response.json();
+                    
+                    let enviados = 0;
+                    for (const pagamento of pendentes) {
+                        try {
+                            await this.enviarMensagemN8N('pagamento', pagamento);
+                            enviados++;
+                        } catch (error) {
+                            console.error('Erro ao enviar para:', pagamento.nome, error);
+                        }
+                    }
+                    
+                    this.showNotification('success', `Lembretes enviados para ${enviados} pessoas!`);
+                    await this.carregarDashboard();
+                } catch (error) {
+                    this.showNotification('error', 'Erro ao enviar lembretes: ' + error.message);
+                }
+            }
+
+            async enviarMensagemN8N(tipoMensagem, dados) {
+                const webhookUrl = this.baseUrlN8N + this.webhooks[tipoMensagem];
+                
+                const payload = {
+                    ...dados,
+                    timestamp: new Date().toISOString(),
+                    sistema: 'face-a-face'
+                };
+
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                return response.json();
+            }
+
+            showNotification(type, message) {
+                const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+                const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+                
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert ${alertClass} alert-dismissible fade show`;
+                alertDiv.innerHTML = `
+                    <i class="fas ${icon} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                
+                document.getElementById('notifications').appendChild(alertDiv);
+                
+                // Remove após 5 segundos
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.parentNode.removeChild(alertDiv);
+                    }
+                }, 5000);
+            }
+
+            showLoading(message) {
+                this.showNotification('info', `<i class="fas fa-spinner fa-spin me-2"></i>${message}`);
+            }
+        }
+
+        // Funções globais
+        let gestorN8N;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            gestorN8N = new GestorPagamentosN8N();
+        });
+
+        async function enviarLembretesPagamento() {
+            await gestorN8N.enviarLembretesPagamento();
+        }
+
+        async function enviarBoasVindas() {
+            gestorN8N.showNotification('info', 'Funcionalidade de boas-vindas em desenvolvimento');
+        }
+
+        async function enviarLembreteEvento() {
+            gestorN8N.showNotification('info', 'Funcionalidade de lembrete de evento em desenvolvimento');
+        }
+
+        async function testarN8N() {
+            try {
+                const response = await fetch('http://localhost:5678/webhook/test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ teste: true })
+                });
+                
+                if (response.ok) {
+                    gestorN8N.showNotification('success', 'n8n está funcionando! ✅');
+                } else {
+                    gestorN8N.showNotification('error', 'n8n não está respondendo ❌');
+                }
+            } catch (error) {
+                gestorN8N.showNotification('error', 'Erro na conexão com n8n: ' + error.message);
+            }
+        }
+
+        async function atualizarDashboard() {
+            await gestorN8N.carregarDashboard();
+            await gestorN8N.carregarPagamentos();
+            gestorN8N.showNotification('success', 'Dashboard atualizado!');
+        }
+
+        function confirmarPagamento(id, tipo) {
+            const valor = prompt('Digite o valor pago:');
+            if (!valor) return;
+            
+            const forma = prompt('Forma de pagamento (PIX, Cartão, Dinheiro, etc.):');
+            if (!forma) return;
+            
+            // Implementar confirmação de pagamento
+            gestorN8N.showNotification('info', 'Funcionalidade de confirmação em desenvolvimento');
+        }
+
+        function exportarPagamentos() {
+            gestorN8N.showNotification('info', 'Funcionalidade de exportação em desenvolvimento');
+        }
+
+        function atualizarStatusPagamentos() {
+            atualizarDashboard();
+        }
+
+        function verLogMensagens() {
+            gestorN8N.showNotification('info', 'Funcionalidade de log em desenvolvimento');
+        }
+    </script>
+</body>
+</html>
