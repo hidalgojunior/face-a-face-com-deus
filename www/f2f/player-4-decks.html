@@ -11,8 +11,7 @@
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
-    <!-- Howler.js para manipulação avançada de áudio -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+    <!-- HTML5 Audio API nativa - maior compatibilidade -->
     
     <style>
         :root {
@@ -792,6 +791,65 @@
             </div>
         </div>
 
+        <!-- Área de Teste -->
+        <div class="row">
+            <div class="col-12">
+                <div class="player-container">
+                    <div class="text-center mb-4">
+                        <h4><i class="fas fa-vial me-2"></i>Área de Teste</h4>
+                        <p class="text-muted">Use estas opções para testar o player</p>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-microphone me-2"></i>Teste de Áudio</h6>
+                                </div>
+                                <div class="card-body">
+                                    <button class="btn btn-primary w-100 mb-2" onclick="testAudioContext()">
+                                        <i class="fas fa-play me-2"></i>Testar Contexto de Áudio
+                                    </button>
+                                    <button class="btn btn-success w-100 mb-2" onclick="generateTestTone(1)">
+                                        <i class="fas fa-volume-up me-2"></i>Gerar Tom de Teste - Deck 1
+                                    </button>
+                                    <small class="text-muted">
+                                        Use estes botões para verificar se o áudio está funcionando
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-info-circle me-2"></i>Status do Sistema</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div id="systemStatus">
+                                        <p><strong>Navegador:</strong> <span id="browserInfo">-</span></p>
+                                        <p><strong>Suporte a Áudio:</strong> <span id="audioSupport">-</span></p>
+                                        <p><strong>Formatos Suportados:</strong></p>
+                                        <div id="formatSupport"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mt-3">
+                        <h6><i class="fas fa-lightbulb me-2"></i>Dicas para Uso:</h6>
+                        <ul class="mb-0">
+                            <li>Use arquivos MP3 ou WAV para melhor compatibilidade</li>
+                            <li>Clique em "Gerar Tom de Teste" primeiro para verificar o áudio</li>
+                            <li>Certifique-se de que o navegador permite reprodução de áudio</li>
+                            <li>Para usar em eventos, teste todas as funcionalidades antes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Footer -->
         <div class="row">
             <div class="col-12">
@@ -868,47 +926,61 @@
                 const file = event.target.files[0];
                 if (!file) return;
                 
-                const url = URL.createObjectURL(file);
-                
-                // Usar Howler.js para melhor controle de áudio
-                if (this.sound) {
-                    this.sound.unload();
+                // Verificar se é um arquivo de áudio
+                if (!file.type.startsWith('audio/')) {
+                    alert('Por favor, selecione um arquivo de áudio válido (MP3, WAV, etc.)');
+                    return;
                 }
                 
-                this.sound = new Howl({
-                    src: [url],
-                    volume: this.volume,
-                    loop: this.isLooping,
-                    onload: () => {
-                        this.updateTrackInfo(file.name);
-                        this.updateDuration();
-                        this.elements.statusIndicator.classList.remove('inactive');
-                    },
-                    onplay: () => {
-                        this.isPlaying = true;
-                        this.updatePlayButton();
-                        this.elements.deckContainer.classList.add('active');
-                        this.startProgressUpdate();
-                    },
-                    onpause: () => {
-                        this.isPlaying = false;
-                        this.updatePlayButton();
-                        this.elements.deckContainer.classList.remove('active');
-                    },
-                    onstop: () => {
+                const url = URL.createObjectURL(file);
+                
+                // Usar elemento audio HTML5 nativo para maior compatibilidade
+                if (this.audio) {
+                    this.audio.pause();
+                    this.audio.src = '';
+                }
+                
+                this.audio = new Audio(url);
+                this.audio.volume = this.volume;
+                this.audio.loop = this.isLooping;
+                this.audio.crossOrigin = "anonymous";
+                
+                // Event listeners para o áudio
+                this.audio.addEventListener('loadedmetadata', () => {
+                    this.updateTrackInfo(file.name);
+                    this.updateDuration();
+                    this.elements.statusIndicator.classList.remove('inactive');
+                    console.log(`Deck ${this.deckNumber}: Música carregada - ${file.name}`);
+                });
+                
+                this.audio.addEventListener('play', () => {
+                    this.isPlaying = true;
+                    this.updatePlayButton();
+                    this.elements.deckContainer.classList.add('active');
+                    this.startProgressUpdate();
+                    console.log(`Deck ${this.deckNumber}: Reprodução iniciada`);
+                });
+                
+                this.audio.addEventListener('pause', () => {
+                    this.isPlaying = false;
+                    this.updatePlayButton();
+                    this.elements.deckContainer.classList.remove('active');
+                    console.log(`Deck ${this.deckNumber}: Reprodução pausada`);
+                });
+                
+                this.audio.addEventListener('ended', () => {
+                    if (!this.isLooping) {
                         this.isPlaying = false;
                         this.updatePlayButton();
                         this.elements.deckContainer.classList.remove('active');
                         this.elements.progressBar.style.width = '0%';
-                    },
-                    onend: () => {
-                        if (!this.isLooping) {
-                            this.isPlaying = false;
-                            this.updatePlayButton();
-                            this.elements.deckContainer.classList.remove('active');
-                            this.elements.progressBar.style.width = '0%';
-                        }
+                        console.log(`Deck ${this.deckNumber}: Reprodução finalizada`);
                     }
+                });
+                
+                this.audio.addEventListener('error', (e) => {
+                    console.error(`Deck ${this.deckNumber}: Erro ao carregar áudio:`, e);
+                    alert(`Erro ao carregar o arquivo de áudio no Deck ${this.deckNumber}`);
                 });
                 
                 // Calcular BPM (simulado)
@@ -917,12 +989,26 @@
             }
             
             togglePlay() {
-                if (!this.sound) return;
+                if (!this.audio) {
+                    alert(`Primeiro carregue uma música no Deck ${this.deckNumber}`);
+                    return;
+                }
                 
-                if (this.isPlaying) {
-                    this.sound.pause();
-                } else {
-                    this.sound.play();
+                try {
+                    if (this.isPlaying) {
+                        this.audio.pause();
+                    } else {
+                        // Pausar outros decks se necessário
+                        const playPromise = this.audio.play();
+                        if (playPromise !== undefined) {
+                            playPromise.catch(error => {
+                                console.error(`Deck ${this.deckNumber}: Erro ao reproduzir:`, error);
+                                alert(`Erro ao reproduzir no Deck ${this.deckNumber}. Verifique o arquivo de áudio.`);
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.error(`Deck ${this.deckNumber}: Erro no toggle play:`, error);
                 }
             }
             
@@ -930,8 +1016,8 @@
                 this.volume = value / 100;
                 this.elements.volumeDisplay.textContent = `${value}%`;
                 
-                if (this.sound) {
-                    this.sound.volume(this.volume);
+                if (this.audio) {
+                    this.audio.volume = this.volume;
                 }
                 
                 // Atualizar gradiente do slider
@@ -944,16 +1030,19 @@
                 this.isLooping = !this.isLooping;
                 this.elements.loopButton.classList.toggle('active', this.isLooping);
                 
-                if (this.sound) {
-                    this.sound.loop(this.isLooping);
+                if (this.audio) {
+                    this.audio.loop = this.isLooping;
                 }
+                
+                showNotification(`Deck ${this.deckNumber}: Loop ${this.isLooping ? 'ativado' : 'desativado'}`);
             }
             
             setCue() {
-                if (this.sound) {
-                    this.cuePoint = this.sound.seek() || 0;
+                if (this.audio) {
+                    this.cuePoint = this.audio.currentTime || 0;
                     this.elements.cueButton.classList.add('active');
                     setTimeout(() => this.elements.cueButton.classList.remove('active'), 200);
+                    showNotification(`Deck ${this.deckNumber}: Cue point definido em ${this.formatTime(this.cuePoint)}`);
                 }
             }
             
@@ -977,8 +1066,8 @@
             }
             
             updateDuration() {
-                if (this.sound) {
-                    const duration = this.sound.duration();
+                if (this.audio && this.audio.duration) {
+                    const duration = this.audio.duration;
                     this.elements.duration.textContent = this.formatTime(duration);
                 }
             }
@@ -1000,17 +1089,17 @@
                 }
                 
                 this.progressInterval = setInterval(() => {
-                    if (this.sound && this.isPlaying) {
-                        const seek = this.sound.seek() || 0;
-                        const duration = this.sound.duration() || 0;
+                    if (this.audio && this.isPlaying && !this.audio.paused) {
+                        const currentTime = this.audio.currentTime || 0;
+                        const duration = this.audio.duration || 0;
                         
                         if (duration > 0) {
-                            const progress = (seek / duration) * 100;
+                            const progress = (currentTime / duration) * 100;
                             this.elements.progressBar.style.width = `${progress}%`;
-                            this.elements.currentTime.textContent = this.formatTime(seek);
+                            this.elements.currentTime.textContent = this.formatTime(currentTime);
                         }
                     }
-                }, 100);
+                }, 500);
             }
             
             formatTime(seconds) {
@@ -1033,12 +1122,12 @@
                 const leftVolume = (100 - value) / 100;
                 const rightVolume = value / 100;
                 
-                if (this.leftDeck && this.leftDeck.sound) {
-                    this.leftDeck.sound.volume(this.leftDeck.volume * leftVolume);
+                if (this.leftDeck && this.leftDeck.audio) {
+                    this.leftDeck.audio.volume = this.leftDeck.volume * leftVolume;
                 }
                 
-                if (this.rightDeck && this.rightDeck.sound) {
-                    this.rightDeck.sound.volume(this.rightDeck.volume * rightVolume);
+                if (this.rightDeck && this.rightDeck.audio) {
+                    this.rightDeck.audio.volume = this.rightDeck.volume * rightVolume;
                 }
             }
         }
@@ -1204,6 +1293,115 @@
         });
         
         console.log('🎵 Player 4 Decks - Face a Face com Deus inicializado com sucesso!');
+        // Funções de Teste e Diagnóstico
+        function testAudioContext() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) {
+                    const ctx = new AudioContext();
+                    alert('✅ Contexto de áudio criado com sucesso!\nEstado: ' + ctx.state);
+                    console.log('Audio Context:', ctx);
+                    
+                    // Tentar criar um oscilador
+                    const oscillator = ctx.createOscillator();
+                    const gainNode = ctx.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(ctx.destination);
+                    
+                    oscillator.frequency.setValueAtTime(440, ctx.currentTime);
+                    gainNode.gain.setValueAtTime(0.1, ctx.currentTime);
+                    
+                    oscillator.start();
+                    oscillator.stop(ctx.currentTime + 0.5);
+                    
+                    alert('✅ Tom de teste de 440Hz reproduzido por 0.5s');
+                } else {
+                    alert('❌ Web Audio API não suportada neste navegador');
+                }
+            } catch (error) {
+                console.error('Erro ao testar contexto de áudio:', error);
+                alert('❌ Erro ao criar contexto de áudio: ' + error.message);
+            }
+        }
+
+        function generateTestTone(deckNumber) {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                const ctx = new AudioContext();
+                
+                const oscillator = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(ctx.destination);
+                
+                // Frequências diferentes para cada deck
+                const frequencies = { 1: 440, 2: 523, 3: 659, 4: 784 };
+                const frequency = frequencies[deckNumber] || 440;
+                
+                oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
+                oscillator.type = 'sine';
+                gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
+                
+                oscillator.start();
+                oscillator.stop(ctx.currentTime + 1);
+                
+                console.log(`Tom de teste gerado para Deck ${deckNumber}: ${frequency}Hz`);
+                alert(`🎵 Tom de teste reproduzido no Deck ${deckNumber} (${frequency}Hz)`);
+                
+            } catch (error) {
+                console.error('Erro ao gerar tom de teste:', error);
+                alert('❌ Erro ao gerar tom: ' + error.message);
+            }
+        }
+
+        function checkSystemStatus() {
+            // Verificar se os elementos existem antes de tentar usar
+            const browserInfo = document.getElementById('browserInfo');
+            const audioSupport = document.getElementById('audioSupport');
+            const formatSupport = document.getElementById('formatSupport');
+            
+            if (browserInfo) {
+                browserInfo.textContent = navigator.userAgent.split(')')[0] + ')';
+            }
+            
+            // Suporte a áudio
+            const audioSupported = typeof Audio !== 'undefined';
+            if (audioSupport) {
+                audioSupport.innerHTML = audioSupported ? 
+                    '<span class="text-success">✅ Suportado</span>' : 
+                    '<span class="text-danger">❌ Não Suportado</span>';
+            }
+            
+            // Formatos suportados
+            if (formatSupport && audioSupported) {
+                const audio = new Audio();
+                const formats = {
+                    'MP3': 'audio/mpeg',
+                    'WAV': 'audio/wav',
+                    'OGG': 'audio/ogg',
+                    'AAC': 'audio/aac',
+                    'FLAC': 'audio/flac'
+                };
+                
+                let formatList = '';
+                for (const [name, type] of Object.entries(formats)) {
+                    const support = audio.canPlayType(type);
+                    const icon = support === 'probably' ? '✅' : support === 'maybe' ? '⚠️' : '❌';
+                    formatList += `<small class="d-block">${icon} ${name}: ${support || 'não suportado'}</small>`;
+                }
+                formatSupport.innerHTML = formatList;
+            } else if (formatSupport) {
+                formatSupport.innerHTML = '<small class="text-danger">Áudio não disponível</small>';
+            }
+        }
+
+        // Inicializar verificação do sistema quando a página carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            checkSystemStatus();
+        });
+
     </script>
 </body>
 </html>
