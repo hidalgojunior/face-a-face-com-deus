@@ -1,6 +1,8 @@
 # 🎯 Face a Face com Deus - Sistema de Gestão de Eventos
 
-![GitHub](https://img.shields.io/github/license/seu-usuario/face-a-face)
+![GitHub](https://img.shields.io/github/license/hidalgojunior/face-a-face-com-deus)
+![GitHub release](https://img.shields.io/github/v/release/hidalgojunior/face-a-face-com-deus)
+![GitHub stars](https://img.shields.io/github/stars/hidalgojunior/face-a-face-com-deus)
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)
 ![PHP](https://img.shields.io/badge/php-%23777BB4.svg?style=flat&logo=php&logoColor=white)
 ![MySQL](https://img.shields.io/badge/mysql-%2300f.svg?style=flat&logo=mysql&logoColor=white)
