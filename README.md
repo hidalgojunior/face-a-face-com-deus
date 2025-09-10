@@ -1,8 +1,40 @@
-# 🚀 Servidor de Desenvolvimento Completo
+# 🎯 Face a Face com Deus - Sistema de Gestão de Eventos
 
-Este é um ambiente de desenvolvimento completo usando Docker Compose com todos os serviços necessários para desenvolvimento web moderno.
+![GitHub](https://img.shields.io/github/license/seu-usuario/face-a-face)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)
+![PHP](https://img.shields.io/badge/php-%23777BB4.svg?style=flat&logo=php&logoColor=white)
+![MySQL](https://img.shields.io/badge/mysql-%2300f.svg?style=flat&logo=mysql&logoColor=white)
+![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=flat&logo=javascript&logoColor=%23F7DF1E)
 
-## 📋 Serviços Incluídos
+## 📋 Sobre o Projeto
+
+O **Face a Face com Deus** é um sistema completo de gestão de eventos religiosos, desenvolvido especialmente para encontros espirituais. O sistema oferece funcionalidades avançadas de áudio/vídeo, automação de pagamentos e gestão de ministração.
+
+### 🚀 Principais Funcionalidades
+
+- **🎵 Player Profissional com 4 Decks**
+  - Crossfaders independentes
+  - Sistema de automix inteligente
+  - Suporte a múltiplos formatos de áudio/vídeo
+  - Controle de volume por canal
+
+- **📊 Dashboard de Pagamentos**
+  - Integração com n8n para automação
+  - Gestão de pagamentos de encontristas e encontreiros
+  - Relatórios financeiros detalhados
+  - Notificações automáticas
+
+- **🙏 Gestão de Ministração**
+  - Controle de cobertura espiritual
+  - Escalas de intercessão
+  - Acompanhamento de ministrações
+
+- **💻 Integração PowerPoint**
+  - Sincronização automática de slides
+  - Controle remoto de apresentações
+  - Suporte a múltiplas telas
+
+## 📋 Serviços Docker Incluídos
 
 - **🌐 Nginx** - Servidor web com SSL/TLS (HTTP e HTTPS)
 - **🐘 PHP 8.2** - PHP-FPM com extensões completas
@@ -11,8 +43,9 @@ Este é um ambiente de desenvolvimento completo usando Docker Compose com todos 
 - **🐘 PostgreSQL 15** - Banco de dados avançado
 - **🔧 pgAdmin** - Interface web para PostgreSQL
 - **🐍 Python 3.11** - Ambiente Python com frameworks
-- ** FTP Server** - Servidor FTP para transferência de arquivos
+- **📡 FTP Server** - Servidor FTP para transferência de arquivos
 - **🗂️ File Manager** - Interface web para gerenciamento de arquivos
+- **🤖 n8n** - Automação e workflows
 
 ## 🚀 Como Usar
 
