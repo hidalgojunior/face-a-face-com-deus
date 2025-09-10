@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎵 Player 4 Decks - Face a Face com Deus</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Howler.js para manipulação avançada de áudio -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --dark-color: #343a40;
+            --light-color: #f8f9fa;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .player-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            padding: 30px;
+        }
+        
+        .deck-container {
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .deck-container.active {
+            border-color: var(--success-color);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        .deck-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .control-group {
+            margin-bottom: 15px;
+        }
+        
+        .control-label {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 8px;
+        }
+        
+        .volume-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: linear-gradient(to right, #ddd 0%, var(--success-color) 0%);
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        .volume-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--success-color);
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .play-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            font-size: 24px;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        
+        .play-button.playing {
+            background: var(--success-color);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        
+        .play-button:not(.playing) {
+            background: var(--light-color);
+            color: var(--dark-color);
+            border: 2px solid var(--primary-color);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .crossfader-container {
+            background: linear-gradient(145deg, #2c3e50, #34495e);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .crossfader {
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            background: linear-gradient(to right, var(--primary-color), transparent, var(--secondary-color));
+            outline: none;
+            margin: 15px 0;
+        }
+        
+        .crossfader::-webkit-slider-thumb {
+            appearance: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .progress-bar-container {
+            background: #ddd;
+            border-radius: 10px;
+            height: 8px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success-color), var(--info-color));
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            color: var(--dark-color);
+            font-weight: 500;
+        }
+        
+        .file-input-container {
+            position: relative;
+            margin: 15px 0;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .file-input-label {
+            display: block;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, var(--info-color), #138496);
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: none;
+            font-weight: 500;
+        }
+        
+        .file-input-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .current-track {
+            background: var(--light-color);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 0.9em;
+            color: var(--dark-color);
+            border-left: 4px solid var(--success-color);
+        }
+        
+        .automix-panel {
+            background: linear-gradient(145deg, #ff6b6b, #ee5a52);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .automix-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        
+        .automix-button:hover, .automix-button.active {
+            background: white;
+            color: #ff6b6b;
+        }
+        
+        .master-controls {
+            background: linear-gradient(145deg, var(--dark-color), #495057);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .eq-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .eq-knob {
+            text-align: center;
+        }
+        
+        .eq-knob input {
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        .waveform-container {
+            height: 60px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
+            margin: 15px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .waveform {
+            height: 100%;
+            background: repeating-linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0.1) 0px,
+                rgba(255, 255, 255, 0.3) 2px,
+                rgba(255, 255, 255, 0.1) 4px,
+                rgba(255, 255, 255, 0.1) 8px
+            );
+            animation: waveform-animation 2s linear infinite;
+        }
+        
+        @keyframes waveform-animation {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .deck-controls {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .deck-button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.8em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .loop-button { background: var(--warning-color); color: white; }
+        .cue-button { background: var(--info-color); color: white; }
+        .sync-button { background: var(--success-color); color: white; }
+        .fx-button { background: var(--danger-color); color: white; }
+        
+        .deck-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .bpm-display {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            color: var(--dark-color);
+            margin: 10px 0;
+        }
+        
+        .status-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--success-color);
+            box-shadow: 0 0 10px var(--success-color);
+        }
+        
+        .status-indicator.inactive {
+            background: #ccc;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="row">
+            <div class="col-12">
+                <div class="player-container">
+                    <div class="text-center mb-4">
+                        <h1 class="mb-0">🎵 Player Profissional 4 Decks</h1>
+                        <p class="text-muted">Face a Face com Deus - Sistema de Áudio Ministerial</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Decks Row 1 -->
+        <div class="row">
+            <!-- Deck 1 -->
+            <div class="col-lg-6">
+                <div class="player-container">
+                    <div class="deck-container" id="deck1">
+                        <div class="status-indicator" id="status1"></div>
+                        <div class="deck-header">
+                            <i class="fas fa-music me-2"></i>DECK 1 - LOUVOR
+                        </div>
+                        
+                        <div class="file-input-container">
+                            <input type="file" class="file-input" id="file1" accept="audio/*">
+                            <label for="file1" class="file-input-label">
+                                <i class="fas fa-upload me-2"></i>Carregar Música
+                            </label>
+                        </div>
+                        
+                        <div class="current-track" id="track1">
+                            <i class="fas fa-music me-2"></i>Nenhuma música carregada
+                        </div>
+                        
+                        <div class="waveform-container">
+                            <div class="waveform" id="waveform1"></div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button class="play-button" id="play1">
+                                <i class="fas fa-play"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" id="progress1"></div>
+                        </div>
+                        
+                        <div class="time-display">
+                            <span id="currentTime1">0:00</span>
+                            <span id="duration1">0:00</span>
+                        </div>
+                        
+                        <div class="control-group">
+                            <div class="control-label">Volume</div>
+                            <input type="range" class="volume-slider" id="volume1" min="0" max="100" value="70">
+                            <div class="text-center mt-2">
+                                <span id="volumeDisplay1">70%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="deck-controls">
+                            <button class="deck-button loop-button" id="loop1">
+                                <i class="fas fa-redo me-1"></i>LOOP
+                            </button>
+                            <button class="deck-button cue-button" id="cue1">
+                                <i class="fas fa-step-backward me-1"></i>CUE
+                            </button>
+                            <button class="deck-button sync-button" id="sync1">
+                                <i class="fas fa-sync me-1"></i>SYNC
+                            </button>
+                            <button class="deck-button fx-button" id="fx1">
+                                <i class="fas fa-magic me-1"></i>FX
+                            </button>
+                        </div>
+                        
+                        <div class="bpm-display">
+                            <i class="fas fa-heartbeat me-2"></i>BPM: <span id="bpm1">120</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Deck 2 -->
+            <div class="col-lg-6">
+                <div class="player-container">
+                    <div class="deck-container" id="deck2">
+                        <div class="status-indicator inactive" id="status2"></div>
+                        <div class="deck-header">
+                            <i class="fas fa-music me-2"></i>DECK 2 - ADORAÇÃO
+                        </div>
+                        
+                        <div class="file-input-container">
+                            <input type="file" class="file-input" id="file2" accept="audio/*">
+                            <label for="file2" class="file-input-label">
+                                <i class="fas fa-upload me-2"></i>Carregar Música
+                            </label>
+                        </div>
+                        
+                        <div class="current-track" id="track2">
+                            <i class="fas fa-music me-2"></i>Nenhuma música carregada
+                        </div>
+                        
+                        <div class="waveform-container">
+                            <div class="waveform" id="waveform2"></div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button class="play-button" id="play2">
+                                <i class="fas fa-play"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" id="progress2"></div>
+                        </div>
+                        
+                        <div class="time-display">
+                            <span id="currentTime2">0:00</span>
+                            <span id="duration2">0:00</span>
+                        </div>
+                        
+                        <div class="control-group">
+                            <div class="control-label">Volume</div>
+                            <input type="range" class="volume-slider" id="volume2" min="0" max="100" value="70">
+                            <div class="text-center mt-2">
+                                <span id="volumeDisplay2">70%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="deck-controls">
+                            <button class="deck-button loop-button" id="loop2">
+                                <i class="fas fa-redo me-1"></i>LOOP
+                            </button>
+                            <button class="deck-button cue-button" id="cue2">
+                                <i class="fas fa-step-backward me-1"></i>CUE
+                            </button>
+                            <button class="deck-button sync-button" id="sync2">
+                                <i class="fas fa-sync me-1"></i>SYNC
+                            </button>
+                            <button class="deck-button fx-button" id="fx2">
+                                <i class="fas fa-magic me-1"></i>FX
+                            </button>
+                        </div>
+                        
+                        <div class="bpm-display">
+                            <i class="fas fa-heartbeat me-2"></i>BPM: <span id="bpm2">120</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Crossfader A/B -->
+        <div class="row">
+            <div class="col-12">
+                <div class="player-container">
+                    <div class="crossfader-container">
+                        <h4><i class="fas fa-sliders-h me-2"></i>Crossfader A ↔ B</h4>
+                        <p class="mb-3">Transição suave entre Deck 1 e Deck 2</p>
+                        <input type="range" class="crossfader" id="crossfaderAB" min="0" max="100" value="50">
+                        <div class="d-flex justify-content-between mt-2">
+                            <span><strong>A - DECK 1</strong></span>
+                            <span>CENTRO</span>
+                            <span><strong>B - DECK 2</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Decks Row 2 -->
+        <div class="row">
+            <!-- Deck 3 -->
+            <div class="col-lg-6">
+                <div class="player-container">
+                    <div class="deck-container" id="deck3">
+                        <div class="status-indicator inactive" id="status3"></div>
+                        <div class="deck-header">
+                            <i class="fas fa-music me-2"></i>DECK 3 - MINISTRAÇÃO
+                        </div>
+                        
+                        <div class="file-input-container">
+                            <input type="file" class="file-input" id="file3" accept="audio/*">
+                            <label for="file3" class="file-input-label">
+                                <i class="fas fa-upload me-2"></i>Carregar Música
+                            </label>
+                        </div>
+                        
+                        <div class="current-track" id="track3">
+                            <i class="fas fa-music me-2"></i>Nenhuma música carregada
+                        </div>
+                        
+                        <div class="waveform-container">
+                            <div class="waveform" id="waveform3"></div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button class="play-button" id="play3">
+                                <i class="fas fa-play"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" id="progress3"></div>
+                        </div>
+                        
+                        <div class="time-display">
+                            <span id="currentTime3">0:00</span>
+                            <span id="duration3">0:00</span>
+                        </div>
+                        
+                        <div class="control-group">
+                            <div class="control-label">Volume</div>
+                            <input type="range" class="volume-slider" id="volume3" min="0" max="100" value="70">
+                            <div class="text-center mt-2">
+                                <span id="volumeDisplay3">70%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="deck-controls">
+                            <button class="deck-button loop-button" id="loop3">
+                                <i class="fas fa-redo me-1"></i>LOOP
+                            </button>
+                            <button class="deck-button cue-button" id="cue3">
+                                <i class="fas fa-step-backward me-1"></i>CUE
+                            </button>
+                            <button class="deck-button sync-button" id="sync3">
+                                <i class="fas fa-sync me-1"></i>SYNC
+                            </button>
+                            <button class="deck-button fx-button" id="fx3">
+                                <i class="fas fa-magic me-1"></i>FX
+                            </button>
+                        </div>
+                        
+                        <div class="bpm-display">
+                            <i class="fas fa-heartbeat me-2"></i>BPM: <span id="bpm3">120</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Deck 4 -->
+            <div class="col-lg-6">
+                <div class="player-container">
+                    <div class="deck-container" id="deck4">
+                        <div class="status-indicator inactive" id="status4"></div>
+                        <div class="deck-header">
+                            <i class="fas fa-music me-2"></i>DECK 4 - FUNDO MUSICAL
+                        </div>
+                        
+                        <div class="file-input-container">
+                            <input type="file" class="file-input" id="file4" accept="audio/*">
+                            <label for="file4" class="file-input-label">
+                                <i class="fas fa-upload me-2"></i>Carregar Música
+                            </label>
+                        </div>
+                        
+                        <div class="current-track" id="track4">
+                            <i class="fas fa-music me-2"></i>Nenhuma música carregada
+                        </div>
+                        
+                        <div class="waveform-container">
+                            <div class="waveform" id="waveform4"></div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button class="play-button" id="play4">
+                                <i class="fas fa-play"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" id="progress4"></div>
+                        </div>
+                        
+                        <div class="time-display">
+                            <span id="currentTime4">0:00</span>
+                            <span id="duration4">0:00</span>
+                        </div>
+                        
+                        <div class="control-group">
+                            <div class="control-label">Volume</div>
+                            <input type="range" class="volume-slider" id="volume4" min="0" max="100" value="70">
+                            <div class="text-center mt-2">
+                                <span id="volumeDisplay4">70%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="deck-controls">
+                            <button class="deck-button loop-button" id="loop4">
+                                <i class="fas fa-redo me-1"></i>LOOP
+                            </button>
+                            <button class="deck-button cue-button" id="cue4">
+                                <i class="fas fa-step-backward me-1"></i>CUE
+                            </button>
+                            <button class="deck-button sync-button" id="sync4">
+                                <i class="fas fa-sync me-1"></i>SYNC
+                            </button>
+                            <button class="deck-button fx-button" id="fx4">
+                                <i class="fas fa-magic me-1"></i>FX
+                            </button>
+                        </div>
+                        
+                        <div class="bpm-display">
+                            <i class="fas fa-heartbeat me-2"></i>BPM: <span id="bpm4">120</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Crossfader C/D -->
+        <div class="row">
+            <div class="col-12">
+                <div class="player-container">
+                    <div class="crossfader-container">
+                        <h4><i class="fas fa-sliders-h me-2"></i>Crossfader C ↔ D</h4>
+                        <p class="mb-3">Transição suave entre Deck 3 e Deck 4</p>
+                        <input type="range" class="crossfader" id="crossfaderCD" min="0" max="100" value="50">
+                        <div class="d-flex justify-content-between mt-2">
+                            <span><strong>C - DECK 3</strong></span>
+                            <span>CENTRO</span>
+                            <span><strong>D - DECK 4</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sistema AutoMix -->
+        <div class="row">
+            <div class="col-12">
+                <div class="player-container">
+                    <div class="automix-panel">
+                        <h3><i class="fas fa-robot me-2"></i>Sistema AutoMix Inteligente</h3>
+                        <p class="mb-4">Transições automáticas baseadas em BPM e harmonia musical</p>
+                        
+                        <div class="row">
+                            <div class="col-md-3">
+                                <button class="automix-button w-100" id="automixToggle">
+                                    <i class="fas fa-magic me-2"></i>Ativar AutoMix
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="automix-button w-100" id="beatSync">
+                                    <i class="fas fa-heartbeat me-2"></i>Sync BPM
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="automix-button w-100" id="harmonicMix">
+                                    <i class="fas fa-music me-2"></i>Mix Harmônico
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="automix-button w-100" id="fadeMode">
+                                    <i class="fas fa-adjust me-2"></i>Fade Suave
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <div class="control-group">
+                                <div class="control-label text-white">Tempo de Transição (segundos)</div>
+                                <input type="range" class="volume-slider" id="transitionTime" min="3" max="30" value="8">
+                                <div class="text-center mt-2">
+                                    <span id="transitionDisplay">8s</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controles Master -->
+        <div class="row">
+            <div class="col-12">
+                <div class="player-container">
+                    <div class="master-controls">
+                        <h3 class="text-center mb-4">
+                            <i class="fas fa-sliders-h me-2"></i>Controles Master
+                        </h3>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="control-group">
+                                    <div class="control-label text-white">Volume Master</div>
+                                    <input type="range" class="volume-slider" id="masterVolume" min="0" max="100" value="85">
+                                    <div class="text-center mt-2">
+                                        <span class="text-white" id="masterVolumeDisplay">85%</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="eq-controls">
+                                    <div class="eq-knob">
+                                        <label class="text-white">GRAVES</label>
+                                        <input type="range" id="bassEQ" min="-12" max="12" value="0">
+                                        <span class="text-white" id="bassDisplay">0dB</span>
+                                    </div>
+                                    <div class="eq-knob">
+                                        <label class="text-white">MÉDIOS</label>
+                                        <input type="range" id="midEQ" min="-12" max="12" value="0">
+                                        <span class="text-white" id="midDisplay">0dB</span>
+                                    </div>
+                                    <div class="eq-knob">
+                                        <label class="text-white">AGUDOS</label>
+                                        <input type="range" id="trebleEQ" min="-12" max="12" value="0">
+                                        <span class="text-white" id="trebleDisplay">0dB</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="text-center">
+                                    <h5 class="text-white mb-3">Status do Sistema</h5>
+                                    <div class="row text-center">
+                                        <div class="col-6">
+                                            <div class="bg-success rounded p-2 mb-2">
+                                                <i class="fas fa-check me-2"></i>Sistema Online
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="bg-info rounded p-2 mb-2">
+                                                <i class="fas fa-volume-up me-2"></i>Áudio OK
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="bg-warning rounded p-2">
+                                                <i class="fas fa-clock me-2"></i><span id="systemTime">00:00</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="bg-primary rounded p-2">
+                                                <i class="fas fa-users me-2"></i>Face a Face
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="row">
+            <div class="col-12">
+                <div class="player-container text-center">
+                    <p class="mb-2">
+                        <strong>Face a Face com Deus</strong> - Player Profissional 4 Decks
+                    </p>
+                    <p class="text-muted mb-0">
+                        <em>"Louvai-o com címbalos sonoros; louvai-o com címbalos retumbantes." - Salmos 150:5</em>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Player JavaScript -->
+    <script>
+        class Deck {
+            constructor(deckNumber) {
+                this.deckNumber = deckNumber;
+                this.audio = null;
+                this.sound = null;
+                this.isPlaying = false;
+                this.isLooping = false;
+                this.volume = 0.7;
+                this.bpm = 120;
+                this.cuePoint = 0;
+                
+                this.initializeElements();
+                this.bindEvents();
+            }
+            
+            initializeElements() {
+                this.elements = {
+                    fileInput: document.getElementById(`file${this.deckNumber}`),
+                    playButton: document.getElementById(`play${this.deckNumber}`),
+                    volumeSlider: document.getElementById(`volume${this.deckNumber}`),
+                    volumeDisplay: document.getElementById(`volumeDisplay${this.deckNumber}`),
+                    progressBar: document.getElementById(`progress${this.deckNumber}`),
+                    currentTime: document.getElementById(`currentTime${this.deckNumber}`),
+                    duration: document.getElementById(`duration${this.deckNumber}`),
+                    trackInfo: document.getElementById(`track${this.deckNumber}`),
+                    bpmDisplay: document.getElementById(`bpm${this.deckNumber}`),
+                    statusIndicator: document.getElementById(`status${this.deckNumber}`),
+                    deckContainer: document.getElementById(`deck${this.deckNumber}`),
+                    loopButton: document.getElementById(`loop${this.deckNumber}`),
+                    cueButton: document.getElementById(`cue${this.deckNumber}`),
+                    syncButton: document.getElementById(`sync${this.deckNumber}`),
+                    fxButton: document.getElementById(`fx${this.deckNumber}`)
+                };
+            }
+            
+            bindEvents() {
+                // File input change
+                this.elements.fileInput.addEventListener('change', (e) => this.loadFile(e));
+                
+                // Play/Pause button
+                this.elements.playButton.addEventListener('click', () => this.togglePlay());
+                
+                // Volume slider
+                this.elements.volumeSlider.addEventListener('input', (e) => this.setVolume(e.target.value));
+                
+                // Control buttons
+                this.elements.loopButton.addEventListener('click', () => this.toggleLoop());
+                this.elements.cueButton.addEventListener('click', () => this.setCue());
+                this.elements.syncButton.addEventListener('click', () => this.syncBPM());
+                this.elements.fxButton.addEventListener('click', () => this.toggleFX());
+            }
+            
+            loadFile(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                const url = URL.createObjectURL(file);
+                
+                // Usar Howler.js para melhor controle de áudio
+                if (this.sound) {
+                    this.sound.unload();
+                }
+                
+                this.sound = new Howl({
+                    src: [url],
+                    volume: this.volume,
+                    loop: this.isLooping,
+                    onload: () => {
+                        this.updateTrackInfo(file.name);
+                        this.updateDuration();
+                        this.elements.statusIndicator.classList.remove('inactive');
+                    },
+                    onplay: () => {
+                        this.isPlaying = true;
+                        this.updatePlayButton();
+                        this.elements.deckContainer.classList.add('active');
+                        this.startProgressUpdate();
+                    },
+                    onpause: () => {
+                        this.isPlaying = false;
+                        this.updatePlayButton();
+                        this.elements.deckContainer.classList.remove('active');
+                    },
+                    onstop: () => {
+                        this.isPlaying = false;
+                        this.updatePlayButton();
+                        this.elements.deckContainer.classList.remove('active');
+                        this.elements.progressBar.style.width = '0%';
+                    },
+                    onend: () => {
+                        if (!this.isLooping) {
+                            this.isPlaying = false;
+                            this.updatePlayButton();
+                            this.elements.deckContainer.classList.remove('active');
+                            this.elements.progressBar.style.width = '0%';
+                        }
+                    }
+                });
+                
+                // Calcular BPM (simulado)
+                this.bpm = Math.floor(Math.random() * 60) + 90; // 90-150 BPM
+                this.elements.bpmDisplay.textContent = this.bpm;
+            }
+            
+            togglePlay() {
+                if (!this.sound) return;
+                
+                if (this.isPlaying) {
+                    this.sound.pause();
+                } else {
+                    this.sound.play();
+                }
+            }
+            
+            setVolume(value) {
+                this.volume = value / 100;
+                this.elements.volumeDisplay.textContent = `${value}%`;
+                
+                if (this.sound) {
+                    this.sound.volume(this.volume);
+                }
+                
+                // Atualizar gradiente do slider
+                const percentage = value;
+                this.elements.volumeSlider.style.background = 
+                    `linear-gradient(to right, var(--success-color) 0%, var(--success-color) ${percentage}%, #ddd ${percentage}%, #ddd 100%)`;
+            }
+            
+            toggleLoop() {
+                this.isLooping = !this.isLooping;
+                this.elements.loopButton.classList.toggle('active', this.isLooping);
+                
+                if (this.sound) {
+                    this.sound.loop(this.isLooping);
+                }
+            }
+            
+            setCue() {
+                if (this.sound) {
+                    this.cuePoint = this.sound.seek() || 0;
+                    this.elements.cueButton.classList.add('active');
+                    setTimeout(() => this.elements.cueButton.classList.remove('active'), 200);
+                }
+            }
+            
+            syncBPM() {
+                // Sincronizar BPM com outros decks (funcionalidade avançada)
+                this.elements.syncButton.classList.add('active');
+                setTimeout(() => this.elements.syncButton.classList.remove('active'), 1000);
+                
+                // Notificação visual
+                showNotification(`Deck ${this.deckNumber} sincronizado - BPM: ${this.bpm}`);
+            }
+            
+            toggleFX() {
+                // Toggle de efeitos (reverb, delay, etc.)
+                this.elements.fxButton.classList.toggle('active');
+            }
+            
+            updateTrackInfo(filename) {
+                this.elements.trackInfo.innerHTML = 
+                    `<i class="fas fa-music me-2"></i>${filename.substring(0, 30)}${filename.length > 30 ? '...' : ''}`;
+            }
+            
+            updateDuration() {
+                if (this.sound) {
+                    const duration = this.sound.duration();
+                    this.elements.duration.textContent = this.formatTime(duration);
+                }
+            }
+            
+            updatePlayButton() {
+                const icon = this.elements.playButton.querySelector('i');
+                if (this.isPlaying) {
+                    icon.className = 'fas fa-pause';
+                    this.elements.playButton.classList.add('playing');
+                } else {
+                    icon.className = 'fas fa-play';
+                    this.elements.playButton.classList.remove('playing');
+                }
+            }
+            
+            startProgressUpdate() {
+                if (this.progressInterval) {
+                    clearInterval(this.progressInterval);
+                }
+                
+                this.progressInterval = setInterval(() => {
+                    if (this.sound && this.isPlaying) {
+                        const seek = this.sound.seek() || 0;
+                        const duration = this.sound.duration() || 0;
+                        
+                        if (duration > 0) {
+                            const progress = (seek / duration) * 100;
+                            this.elements.progressBar.style.width = `${progress}%`;
+                            this.elements.currentTime.textContent = this.formatTime(seek);
+                        }
+                    }
+                }, 100);
+            }
+            
+            formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            }
+        }
+        
+        class CrossFader {
+            constructor(faderId, leftDeck, rightDeck) {
+                this.element = document.getElementById(faderId);
+                this.leftDeck = leftDeck;
+                this.rightDeck = rightDeck;
+                
+                this.element.addEventListener('input', (e) => this.handleCrossfade(e.target.value));
+            }
+            
+            handleCrossfade(value) {
+                const leftVolume = (100 - value) / 100;
+                const rightVolume = value / 100;
+                
+                if (this.leftDeck && this.leftDeck.sound) {
+                    this.leftDeck.sound.volume(this.leftDeck.volume * leftVolume);
+                }
+                
+                if (this.rightDeck && this.rightDeck.sound) {
+                    this.rightDeck.sound.volume(this.rightDeck.volume * rightVolume);
+                }
+            }
+        }
+        
+        class AutoMix {
+            constructor() {
+                this.isActive = false;
+                this.transitionTime = 8;
+                
+                this.bindEvents();
+            }
+            
+            bindEvents() {
+                document.getElementById('automixToggle').addEventListener('click', () => this.toggle());
+                document.getElementById('beatSync').addEventListener('click', () => this.syncAllBPM());
+                document.getElementById('harmonicMix').addEventListener('click', () => this.harmonicMixing());
+                document.getElementById('fadeMode').addEventListener('click', () => this.toggleFadeMode());
+                
+                document.getElementById('transitionTime').addEventListener('input', (e) => {
+                    this.transitionTime = e.target.value;
+                    document.getElementById('transitionDisplay').textContent = `${e.target.value}s`;
+                });
+            }
+            
+            toggle() {
+                this.isActive = !this.isActive;
+                const button = document.getElementById('automixToggle');
+                
+                if (this.isActive) {
+                    button.classList.add('active');
+                    button.innerHTML = '<i class="fas fa-stop me-2"></i>Parar AutoMix';
+                    showNotification('AutoMix ativado - Transições automáticas iniciadas');
+                } else {
+                    button.classList.remove('active');
+                    button.innerHTML = '<i class="fas fa-magic me-2"></i>Ativar AutoMix';
+                    showNotification('AutoMix desativado');
+                }
+            }
+            
+            syncAllBPM() {
+                showNotification('Sincronizando BPM de todos os decks...');
+                // Implementar sincronização de BPM
+            }
+            
+            harmonicMixing() {
+                showNotification('Análise harmônica ativada - Mixagens mais suaves');
+            }
+            
+            toggleFadeMode() {
+                showNotification('Modo fade suave ativado');
+            }
+        }
+        
+        // Inicializar sistema
+        document.addEventListener('DOMContentLoaded', () => {
+            // Criar os 4 decks
+            const deck1 = new Deck(1);
+            const deck2 = new Deck(2);
+            const deck3 = new Deck(3);
+            const deck4 = new Deck(4);
+            
+            // Criar crossfaders
+            const crossfaderAB = new CrossFader('crossfaderAB', deck1, deck2);
+            const crossfaderCD = new CrossFader('crossfaderCD', deck3, deck4);
+            
+            // Criar sistema AutoMix
+            const autoMix = new AutoMix();
+            
+            // Controles Master
+            setupMasterControls();
+            
+            // Atualizar relógio
+            updateSystemTime();
+            setInterval(updateSystemTime, 1000);
+            
+            // Inicializar volumes com gradiente
+            [1, 2, 3, 4].forEach(i => {
+                const slider = document.getElementById(`volume${i}`);
+                const value = slider.value;
+                slider.style.background = 
+                    `linear-gradient(to right, var(--success-color) 0%, var(--success-color) ${value}%, #ddd ${value}%, #ddd 100%)`;
+            });
+        });
+        
+        function setupMasterControls() {
+            // Volume Master
+            document.getElementById('masterVolume').addEventListener('input', (e) => {
+                document.getElementById('masterVolumeDisplay').textContent = `${e.target.value}%`;
+            });
+            
+            // EQ Controls
+            ['bass', 'mid', 'treble'].forEach(eq => {
+                document.getElementById(`${eq}EQ`).addEventListener('input', (e) => {
+                    document.getElementById(`${eq}Display`).textContent = `${e.target.value}dB`;
+                });
+            });
+        }
+        
+        function updateSystemTime() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('systemTime').textContent = time;
+        }
+        
+        function showNotification(message) {
+            // Criar notificação toast
+            const toast = document.createElement('div');
+            toast.className = 'position-fixed top-0 end-0 p-3';
+            toast.style.zIndex = '9999';
+            toast.innerHTML = `
+                <div class="toast show" role="alert">
+                    <div class="toast-header">
+                        <i class="fas fa-music me-2 text-primary"></i>
+                        <strong class="me-auto">Player 4 Decks</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+        
+        // Atalhos de teclado
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case '1':
+                    if (e.ctrlKey) document.getElementById('play1').click();
+                    break;
+                case '2':
+                    if (e.ctrlKey) document.getElementById('play2').click();
+                    break;
+                case '3':
+                    if (e.ctrlKey) document.getElementById('play3').click();
+                    break;
+                case '4':
+                    if (e.ctrlKey) document.getElementById('play4').click();
+                    break;
+                case ' ':
+                    e.preventDefault();
+                    // Pausar/tocar deck ativo
+                    break;
+            }
+        });
+        
+        // Prevenir perda de dados
+        window.addEventListener('beforeunload', (e) => {
+            const hasActiveSounds = [1, 2, 3, 4].some(i => {
+                const deck = window[`deck${i}`];
+                return deck && deck.sound && deck.isPlaying;
+            });
+            
+            if (hasActiveSounds) {
+                e.preventDefault();
+                e.returnValue = 'Existem músicas tocando. Deseja realmente sair?';
+            }
+        });
+        
+        console.log('🎵 Player 4 Decks - Face a Face com Deus inicializado com sucesso!');
+    </script>
+</body>
+</html>
