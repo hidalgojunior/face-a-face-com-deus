@@ -341,6 +341,39 @@
             background: #ccc;
             box-shadow: none;
         }
+
+        /* Estilos da Playlist */
+        .playlist-item {
+            transition: all 0.3s ease;
+            border: 1px solid #e0e0e0 !important;
+        }
+
+        .playlist-item:hover {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef) !important;
+            border-color: #007bff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+        }
+
+        .playlist-item.bg-light {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb) !important;
+            border-color: #2196f3 !important;
+        }
+
+        .playlist-item .btn-group .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .playlist-item .badge {
+            font-size: 0.7rem;
+            padding: 0.25em 0.5em;
+        }
+
+        .card-header h6 {
+            margin-bottom: 0;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -850,6 +883,90 @@
             </div>
         </div>
 
+        <!-- Sistema de Playlist AutoMix -->
+        <div class="row">
+            <div class="col-12">
+                <div class="player-container">
+                    <div class="text-center mb-4">
+                        <h4><i class="fas fa-list-music me-2"></i>Playlist AutoMix</h4>
+                        <p class="text-muted">Sistema automático de reprodução de músicas para eventos</p>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h6><i class="fas fa-music me-2"></i>Lista de Músicas</h6>
+                                    <div>
+                                        <button class="btn btn-sm btn-success me-2" onclick="loadPlaylist()">
+                                            <i class="fas fa-download me-1"></i>Carregar Lista
+                                        </button>
+                                        <button class="btn btn-sm btn-primary" onclick="addToPlaylist()">
+                                            <i class="fas fa-plus me-1"></i>Adicionar
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                                    <div id="playlistContainer">
+                                        <!-- Lista será preenchida via JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-cog me-2"></i>Configurações AutoMix</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col-6">
+                                            <label class="form-label">Tempo de Transição (s)</label>
+                                            <input type="number" id="transitionTime" class="form-control" value="10" min="5" max="30">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="form-label">Intervalo entre Músicas (s)</label>
+                                            <input type="number" id="intervalTime" class="form-control" value="30" min="10" max="300">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">Modo de Reprodução</label>
+                                        <select id="playbackMode" class="form-select">
+                                            <option value="sequential">Sequencial</option>
+                                            <option value="random">Aleatório</option>
+                                            <option value="loop">Loop da Lista</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-success flex-fill" onclick="startAutoMixPlaylist()" id="startAutoMixBtn">
+                                            <i class="fas fa-play me-2"></i>Iniciar AutoMix
+                                        </button>
+                                        <button class="btn btn-danger flex-fill" onclick="stopAutoMixPlaylist()" id="stopAutoMixBtn" disabled>
+                                            <i class="fas fa-stop me-2"></i>Parar AutoMix
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="mt-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <small class="text-muted">Status:</small>
+                                            <span id="autoMixStatus" class="badge bg-secondary">Parado</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">Próxima música:</small>
+                                            <span id="nextTrack" class="text-muted">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Footer -->
         <div class="row">
             <div class="col-12">
@@ -1183,6 +1300,121 @@
         
         // Inicializar sistema
         document.addEventListener('DOMContentLoaded', () => {
+            // Variáveis globais da playlist
+            let autoMixPlaylistActive = false;
+            let autoMixInterval = null;
+            let currentPlaylistIndex = 0;
+            let currentDeck = 1;
+
+            // Lista de músicas para AutoMix (músicas cristãs populares)
+            let playlist = [
+                {
+                    title: "Rude Cruz",
+                    artist: "Hinário Adventista",
+                    genre: "Hino",
+                    duration: "4:30",
+                    url: "" // URL será preenchida quando o usuário carregar o arquivo
+                },
+                {
+                    title: "Amazing Grace",
+                    artist: "Traditional",
+                    genre: "Hino",
+                    duration: "4:15",
+                    url: ""
+                },
+                {
+                    title: "Como é Grande o Meu Deus",
+                    artist: "Hillsong",
+                    genre: "Contemporary",
+                    duration: "5:20",
+                    url: ""
+                },
+                {
+                    title: "Oceanos",
+                    artist: "Hillsong United",
+                    genre: "Contemporary",
+                    duration: "6:45",
+                    url: ""
+                },
+                {
+                    title: "Tua Graça me Basta",
+                    artist: "Fernandinho",
+                    genre: "Gospel",
+                    duration: "4:50",
+                    url: ""
+                },
+                {
+                    title: "Jesus Cristo Basta",
+                    artist: "Aline Barros",
+                    genre: "Gospel",
+                    duration: "5:10",
+                    url: ""
+                },
+                {
+                    title: "Eu Me Rendo",
+                    artist: "Renascer Praise",
+                    genre: "Contemporary",
+                    duration: "5:30",
+                    url: ""
+                },
+                {
+                    title: "Deus de Promessas",
+                    artist: "Toque no Altar",
+                    genre: "Gospel",
+                    duration: "4:25",
+                    url: ""
+                },
+                {
+                    title: "Sonda-me, Usa-me",
+                    artist: "Aline Barros",
+                    genre: "Gospel",
+                    duration: "6:00",
+                    url: ""
+                },
+                {
+                    title: "Santo Santo Santo",
+                    artist: "Hinário Adventista",
+                    genre: "Hino",
+                    duration: "3:45",
+                    url: ""
+                },
+                {
+                    title: "Hosana",
+                    artist: "Gabriela Rocha",
+                    genre: "Contemporary",
+                    duration: "5:15",
+                    url: ""
+                },
+                {
+                    title: "Lugar Secreto",
+                    artist: "Gabriela Rocha",
+                    genre: "Contemporary",
+                    duration: "4:40",
+                    url: ""
+                },
+                {
+                    title: "Águas Purificadoras",
+                    artist: "Diante do Trono",
+                    genre: "Contemporary",
+                    duration: "5:55",
+                    url: ""
+                },
+                {
+                    title: "Espírito Enche a Minha Vida",
+                    artist: "Fernandinho",
+                    genre: "Gospel",
+                    duration: "4:35",
+                    url: ""
+                },
+                {
+                    title: "Bondade de Deus",
+                    artist: "Isaías Saad",
+                    genre: "Contemporary",
+                    duration: "5:25",
+                    url: ""
+                }
+            ];
+
             // Criar os 4 decks
             const deck1 = new Deck(1);
             const deck2 = new Deck(2);
@@ -1293,6 +1525,243 @@
         });
         
         console.log('🎵 Player 4 Decks - Face a Face com Deus inicializado com sucesso!');
+        // Funções da Playlist AutoMix
+        function loadPlaylist() {
+            renderPlaylist();
+        }
+
+        function renderPlaylist() {
+            const container = document.getElementById('playlistContainer');
+            if (!container) return;
+
+            let html = '';
+            playlist.forEach((track, index) => {
+                const isLoaded = track.url && track.url !== '';
+                const statusClass = isLoaded ? 'text-success' : 'text-muted';
+                const statusIcon = isLoaded ? 'fas fa-check-circle' : 'fas fa-circle';
+                
+                html += `
+                    <div class="playlist-item mb-2 p-2 border rounded ${index === currentPlaylistIndex ? 'bg-light' : ''}">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center mb-1">
+                                    <i class="${statusIcon} ${statusClass} me-2"></i>
+                                    <strong>${track.title}</strong>
+                                    ${index === currentPlaylistIndex ? '<span class="badge bg-primary ms-2">Atual</span>' : ''}
+                                </div>
+                                <small class="text-muted d-block">
+                                    ${track.artist} • ${track.genre} • ${track.duration}
+                                </small>
+                            </div>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-primary btn-sm" onclick="loadTrackToPlaylist(${index})">
+                                    <i class="fas fa-upload"></i>
+                                </button>
+                                <button class="btn btn-outline-success btn-sm" onclick="playTrackFromPlaylist(${index})">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function addToPlaylist() {
+            const title = prompt('Nome da música:');
+            const artist = prompt('Artista:');
+            
+            if (title && artist) {
+                playlist.push({
+                    title: title,
+                    artist: artist,
+                    genre: 'Custom',
+                    duration: '0:00',
+                    url: ''
+                });
+                renderPlaylist();
+                console.log('Música adicionada à playlist:', title, 'por', artist);
+            }
+        }
+
+        function loadTrackToPlaylist(index) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'audio/*';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith('audio/')) {
+                    const url = URL.createObjectURL(file);
+                    playlist[index].url = url;
+                    playlist[index].file = file;
+                    renderPlaylist();
+                    console.log(`Arquivo carregado para: ${playlist[index].title}`);
+                } else {
+                    alert('Por favor, selecione um arquivo de áudio válido.');
+                }
+            };
+            
+            input.click();
+        }
+
+        function playTrackFromPlaylist(index) {
+            if (playlist[index].url) {
+                currentPlaylistIndex = index;
+                
+                // Carregar no próximo deck disponível
+                const deck = getNextAvailableDeck();
+                if (deck) {
+                    loadFileToPickedDeck(playlist[index].file, deck.deckNumber);
+                    setTimeout(() => {
+                        deck.togglePlay();
+                    }, 500);
+                    
+                    renderPlaylist();
+                    updateAutoMixStatus();
+                }
+            } else {
+                alert('Primeiro carregue um arquivo de áudio para esta música.');
+            }
+        }
+
+        function getNextAvailableDeck() {
+            const decks = [deck1, deck2, deck3, deck4];
+            
+            // Tentar usar o deck atual
+            if (!decks[currentDeck - 1].isPlaying) {
+                return decks[currentDeck - 1];
+            }
+            
+            // Procurar um deck disponível
+            for (let i = 0; i < decks.length; i++) {
+                if (!decks[i].isPlaying) {
+                    currentDeck = i + 1;
+                    return decks[i];
+                }
+            }
+            
+            // Se todos estão ocupados, usar o deck 1
+            currentDeck = 1;
+            return decks[0];
+        }
+
+        function loadFileToPickedDeck(file, deckNumber) {
+            const deck = [deck1, deck2, deck3, deck4][deckNumber - 1];
+            if (deck && file) {
+                // Simular um evento de change do input file
+                const fakeEvent = {
+                    target: {
+                        files: [file]
+                    }
+                };
+                deck.loadFile(fakeEvent);
+            }
+        }
+
+        function startAutoMixPlaylist() {
+            if (!playlist.some(track => track.url)) {
+                alert('Carregue pelo menos uma música na playlist antes de iniciar o AutoMix.');
+                return;
+            }
+
+            autoMixPlaylistActive = true;
+            document.getElementById('startAutoMixBtn').disabled = true;
+            document.getElementById('stopAutoMixBtn').disabled = false;
+            
+            const intervalTime = parseInt(document.getElementById('intervalTime').value) * 1000;
+            
+            updateAutoMixStatus();
+            
+            // Tocar a primeira música
+            playNextInPlaylist();
+            
+            // Configurar intervalo para próximas músicas
+            autoMixInterval = setInterval(() => {
+                if (autoMixPlaylistActive) {
+                    playNextInPlaylist();
+                }
+            }, intervalTime);
+
+            console.log('AutoMix Playlist iniciado com intervalo de', intervalTime / 1000, 'segundos');
+        }
+
+        function stopAutoMixPlaylist() {
+            autoMixPlaylistActive = false;
+            
+            if (autoMixInterval) {
+                clearInterval(autoMixInterval);
+                autoMixInterval = null;
+            }
+            
+            document.getElementById('startAutoMixBtn').disabled = false;
+            document.getElementById('stopAutoMixBtn').disabled = true;
+            
+            updateAutoMixStatus();
+            console.log('AutoMix Playlist parado');
+        }
+
+        function playNextInPlaylist() {
+            const mode = document.getElementById('playbackMode').value;
+            const availableTracks = playlist.filter(track => track.url);
+            
+            if (availableTracks.length === 0) {
+                stopAutoMixPlaylist();
+                alert('Nenhuma música carregada na playlist.');
+                return;
+            }
+            
+            let nextIndex;
+            
+            switch (mode) {
+                case 'random':
+                    const availableIndexes = playlist.map((track, index) => track.url ? index : -1).filter(i => i >= 0);
+                    nextIndex = availableIndexes[Math.floor(Math.random() * availableIndexes.length)];
+                    break;
+                    
+                case 'loop':
+                    nextIndex = currentPlaylistIndex;
+                    do {
+                        nextIndex = (nextIndex + 1) % playlist.length;
+                    } while (!playlist[nextIndex].url && nextIndex !== currentPlaylistIndex);
+                    break;
+                    
+                default: // sequential
+                    nextIndex = currentPlaylistIndex;
+                    do {
+                        nextIndex = (nextIndex + 1) % playlist.length;
+                    } while (!playlist[nextIndex].url && nextIndex !== currentPlaylistIndex);
+                    break;
+            }
+            
+            if (playlist[nextIndex].url) {
+                playTrackFromPlaylist(nextIndex);
+            }
+        }
+
+        function updateAutoMixStatus() {
+            const statusElement = document.getElementById('autoMixStatus');
+            const nextTrackElement = document.getElementById('nextTrack');
+            
+            if (statusElement) {
+                if (autoMixPlaylistActive) {
+                    statusElement.className = 'badge bg-success';
+                    statusElement.textContent = 'Ativo';
+                } else {
+                    statusElement.className = 'badge bg-secondary';
+                    statusElement.textContent = 'Parado';
+                }
+            }
+            
+            if (nextTrackElement) {
+                const nextIndex = (currentPlaylistIndex + 1) % playlist.length;
+                const nextTrack = playlist.find(track => track.url);
+                nextTrackElement.textContent = nextTrack ? `${nextTrack.title} - ${nextTrack.artist}` : 'Nenhuma';
+            }
+        }
+
         // Funções de Teste e Diagnóstico
         function testAudioContext() {
             try {
@@ -1400,6 +1869,8 @@
         // Inicializar verificação do sistema quando a página carregar
         document.addEventListener('DOMContentLoaded', function() {
             checkSystemStatus();
+            loadPlaylist();
+            updateAutoMixStatus();
         });
 
     </script>
