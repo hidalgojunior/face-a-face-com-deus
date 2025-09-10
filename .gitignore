@@ -36,3 +36,6 @@ sessions/
 
 # Uploads temporários
 uploads/tmp/
+
+# Bancos de dados do filemanager
+filemanager/database/*.db
