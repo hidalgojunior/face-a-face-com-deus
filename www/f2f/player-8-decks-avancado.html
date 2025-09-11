@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎵 Player 4 Decks - Face a Face com Deus</title>
+    <title>🎵 Player 8 Decks Avançado - Face a Face com Deus</title>
     
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -383,8 +383,8 @@
             <div class="col-12">
                 <div class="player-container">
                     <div class="text-center mb-4">
-                        <h1 class="mb-0">🎵 Player Profissional 4 Decks</h1>
-                        <p class="text-muted">Face a Face com Deus - Sistema de Áudio Ministerial</p>
+                        <h1 class="mb-0">🎵 Player Profissional 8 Decks</h1>
+                        <p class="text-muted">Face a Face com Deus - Sistema de Áudio Ministerial Avançado</p>
                     </div>
                 </div>
             </div>
@@ -690,6 +690,265 @@
             </div>
         </div>
 
+        <!-- Decks Extras 5-8 -->
+        <div class="row">
+            <!-- Deck 5 -->
+            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                <div class="deck-container">
+                    <div class="deck-header">
+                        <h4><i class="fas fa-record-vinyl me-2"></i>DECK 5</h4>
+                        <div class="deck-status" id="status5">VAZIO</div>
+                    </div>
+                    
+                    <div class="track-info">
+                        <div class="track-title" id="title5">Nenhuma música carregada</div>
+                        <div class="track-artist" id="artist5">Selecione um arquivo</div>
+                        <div class="track-time">
+                            <span id="current5">00:00</span> / <span id="duration5">00:00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="waveform-container">
+                        <canvas class="waveform" id="waveform5" width="300" height="60"></canvas>
+                        <div class="progress-overlay" id="progress5"></div>
+                    </div>
+                    
+                    <div class="deck-controls mb-3">
+                        <input type="file" class="file-input" id="file5" accept="audio/*">
+                        <label for="file5" class="file-label">
+                            <i class="fas fa-folder-open me-2"></i>Carregar Música
+                        </label>
+                    </div>
+                    
+                    <div class="main-controls">
+                        <button class="play-button" id="play5">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button class="stop-button" id="stop5">
+                            <i class="fas fa-stop"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="volume-control">
+                        <div class="control-label">VOLUME</div>
+                        <input type="range" class="volume-slider" id="volume5" min="0" max="1" step="0.01" value="0.7">
+                        <div class="volume-display"><span id="volumeDisplay5">70%</span></div>
+                    </div>
+                    
+                    <div class="deck-controls">
+                        <button class="deck-button loop-button" id="loop5">
+                            <i class="fas fa-redo me-1"></i>LOOP
+                        </button>
+                        <button class="deck-button cue-button" id="cue5">
+                            <i class="fas fa-step-backward me-1"></i>CUE
+                        </button>
+                        <button class="deck-button sync-button" id="sync5">
+                            <i class="fas fa-sync me-1"></i>SYNC
+                        </button>
+                        <button class="deck-button fx-button" id="fx5">
+                            <i class="fas fa-magic me-1"></i>FX
+                        </button>
+                    </div>
+                    
+                    <div class="bpm-display">
+                        <i class="fas fa-heartbeat me-2"></i>BPM: <span id="bpm5">120</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deck 6 -->
+            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                <div class="deck-container">
+                    <div class="deck-header">
+                        <h4><i class="fas fa-record-vinyl me-2"></i>DECK 6</h4>
+                        <div class="deck-status" id="status6">VAZIO</div>
+                    </div>
+                    
+                    <div class="track-info">
+                        <div class="track-title" id="title6">Nenhuma música carregada</div>
+                        <div class="track-artist" id="artist6">Selecione um arquivo</div>
+                        <div class="track-time">
+                            <span id="current6">00:00</span> / <span id="duration6">00:00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="waveform-container">
+                        <canvas class="waveform" id="waveform6" width="300" height="60"></canvas>
+                        <div class="progress-overlay" id="progress6"></div>
+                    </div>
+                    
+                    <div class="deck-controls mb-3">
+                        <input type="file" class="file-input" id="file6" accept="audio/*">
+                        <label for="file6" class="file-label">
+                            <i class="fas fa-folder-open me-2"></i>Carregar Música
+                        </label>
+                    </div>
+                    
+                    <div class="main-controls">
+                        <button class="play-button" id="play6">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button class="stop-button" id="stop6">
+                            <i class="fas fa-stop"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="volume-control">
+                        <div class="control-label">VOLUME</div>
+                        <input type="range" class="volume-slider" id="volume6" min="0" max="1" step="0.01" value="0.7">
+                        <div class="volume-display"><span id="volumeDisplay6">70%</span></div>
+                    </div>
+                    
+                    <div class="deck-controls">
+                        <button class="deck-button loop-button" id="loop6">
+                            <i class="fas fa-redo me-1"></i>LOOP
+                        </button>
+                        <button class="deck-button cue-button" id="cue6">
+                            <i class="fas fa-step-backward me-1"></i>CUE
+                        </button>
+                        <button class="deck-button sync-button" id="sync6">
+                            <i class="fas fa-sync me-1"></i>SYNC
+                        </button>
+                        <button class="deck-button fx-button" id="fx6">
+                            <i class="fas fa-magic me-1"></i>FX
+                        </button>
+                    </div>
+                    
+                    <div class="bpm-display">
+                        <i class="fas fa-heartbeat me-2"></i>BPM: <span id="bpm6">120</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deck 7 -->
+            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                <div class="deck-container">
+                    <div class="deck-header">
+                        <h4><i class="fas fa-record-vinyl me-2"></i>DECK 7</h4>
+                        <div class="deck-status" id="status7">VAZIO</div>
+                    </div>
+                    
+                    <div class="track-info">
+                        <div class="track-title" id="title7">Nenhuma música carregada</div>
+                        <div class="track-artist" id="artist7">Selecione um arquivo</div>
+                        <div class="track-time">
+                            <span id="current7">00:00</span> / <span id="duration7">00:00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="waveform-container">
+                        <canvas class="waveform" id="waveform7" width="300" height="60"></canvas>
+                        <div class="progress-overlay" id="progress7"></div>
+                    </div>
+                    
+                    <div class="deck-controls mb-3">
+                        <input type="file" class="file-input" id="file7" accept="audio/*">
+                        <label for="file7" class="file-label">
+                            <i class="fas fa-folder-open me-2"></i>Carregar Música
+                        </label>
+                    </div>
+                    
+                    <div class="main-controls">
+                        <button class="play-button" id="play7">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button class="stop-button" id="stop7">
+                            <i class="fas fa-stop"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="volume-control">
+                        <div class="control-label">VOLUME</div>
+                        <input type="range" class="volume-slider" id="volume7" min="0" max="1" step="0.01" value="0.7">
+                        <div class="volume-display"><span id="volumeDisplay7">70%</span></div>
+                    </div>
+                    
+                    <div class="deck-controls">
+                        <button class="deck-button loop-button" id="loop7">
+                            <i class="fas fa-redo me-1"></i>LOOP
+                        </button>
+                        <button class="deck-button cue-button" id="cue7">
+                            <i class="fas fa-step-backward me-1"></i>CUE
+                        </button>
+                        <button class="deck-button sync-button" id="sync7">
+                            <i class="fas fa-sync me-1"></i>SYNC
+                        </button>
+                        <button class="deck-button fx-button" id="fx7">
+                            <i class="fas fa-magic me-1"></i>FX
+                        </button>
+                    </div>
+                    
+                    <div class="bpm-display">
+                        <i class="fas fa-heartbeat me-2"></i>BPM: <span id="bpm7">120</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deck 8 -->
+            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                <div class="deck-container">
+                    <div class="deck-header">
+                        <h4><i class="fas fa-record-vinyl me-2"></i>DECK 8</h4>
+                        <div class="deck-status" id="status8">VAZIO</div>
+                    </div>
+                    
+                    <div class="track-info">
+                        <div class="track-title" id="title8">Nenhuma música carregada</div>
+                        <div class="track-artist" id="artist8">Selecione um arquivo</div>
+                        <div class="track-time">
+                            <span id="current8">00:00</span> / <span id="duration8">00:00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="waveform-container">
+                        <canvas class="waveform" id="waveform8" width="300" height="60"></canvas>
+                        <div class="progress-overlay" id="progress8"></div>
+                    </div>
+                    
+                    <div class="deck-controls mb-3">
+                        <input type="file" class="file-input" id="file8" accept="audio/*">
+                        <label for="file8" class="file-label">
+                            <i class="fas fa-folder-open me-2"></i>Carregar Música
+                        </label>
+                    </div>
+                    
+                    <div class="main-controls">
+                        <button class="play-button" id="play8">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button class="stop-button" id="stop8">
+                            <i class="fas fa-stop"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="volume-control">
+                        <div class="control-label">VOLUME</div>
+                        <input type="range" class="volume-slider" id="volume8" min="0" max="1" step="0.01" value="0.7">
+                        <div class="volume-display"><span id="volumeDisplay8">70%</span></div>
+                    </div>
+                    
+                    <div class="deck-controls">
+                        <button class="deck-button loop-button" id="loop8">
+                            <i class="fas fa-redo me-1"></i>LOOP
+                        </button>
+                        <button class="deck-button cue-button" id="cue8">
+                            <i class="fas fa-step-backward me-1"></i>CUE
+                        </button>
+                        <button class="deck-button sync-button" id="sync8">
+                            <i class="fas fa-sync me-1"></i>SYNC
+                        </button>
+                        <button class="deck-button fx-button" id="fx8">
+                            <i class="fas fa-magic me-1"></i>FX
+                        </button>
+                    </div>
+                    
+                    <div class="bpm-display">
+                        <i class="fas fa-heartbeat me-2"></i>BPM: <span id="bpm8">120</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Crossfader C/D -->
         <div class="row">
             <div class="col-12">
@@ -903,7 +1162,7 @@
             <div class="col-12">
                 <div class="player-container">
                     <div class="text-center mb-4">
-                        <h4><i class="fas fa-list-music me-2"></i>Playlist AutoMix</h4>
+                        <h4><i class="fas fa-list-music me-2"></i>Playlist AutoMix (8 Decks)</h4>
                         <p class="text-muted">Sistema automático de reprodução de músicas para eventos</p>
                     </div>
                     
@@ -1334,11 +1593,15 @@
             let currentPlaylistIndex = 0;
             let currentDeck = 1;
 
-            // Criar os 4 decks
+            // Criar os 8 decks
             const deck1 = new Deck(1);
             const deck2 = new Deck(2);
             const deck3 = new Deck(3);
             const deck4 = new Deck(4);
+            const deck5 = new Deck(5);
+            const deck6 = new Deck(6);
+            const deck7 = new Deck(7);
+            const deck8 = new Deck(8);
             
             // Criar crossfaders
             const crossfaderAB = new CrossFader('crossfaderAB', deck1, deck2);
@@ -1443,7 +1706,7 @@
             }
         });
         
-        console.log('🎵 Player 4 Decks - Face a Face com Deus inicializado com sucesso!');
+        console.log('🎵 Player 8 Decks Avançado - Face a Face com Deus inicializado com sucesso!');
         // FUNÇÕES DA PLAYLIST - VERSÃO FUNCIONAL
         function loadPlaylist() {
             console.log('🎵 Carregando playlist...');
@@ -1925,7 +2188,7 @@
             console.log('🔍 Procurando deck disponível...');
             
             // Método alternativo: usar diretamente os elementos HTML
-            for (let i = 1; i <= 4; i++) {
+            for (let i = 1; i <= 8; i++) {
                 const playBtn = document.getElementById(`play${i}`);
                 if (playBtn) {
                     const isPlaying = playBtn.querySelector('i').classList.contains('fa-pause');
@@ -1988,7 +2251,7 @@
             }
             
             // Verificar decks
-            for (let i = 1; i <= 4; i++) {
+            for (let i = 1; i <= 8; i++) {
                 const input = document.getElementById(`file${i}`);
                 const playBtn = document.getElementById(`play${i}`);
                 console.log(`🎛️ Deck ${i}:`, {

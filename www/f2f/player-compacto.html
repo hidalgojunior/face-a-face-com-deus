@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Compacto - Face a Face com Deus</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #f8f9fa; font-size: 0.9rem; }
+        
+        .deck-compacto {
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .deck-playing { 
+            border-color: #28a745;
+            background: #f8fff8;
+        }
+        
+        .controls-compacto {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 8px 0;
+        }
+        
+        .btn-compacto {
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            border-radius: 4px;
+        }
+        
+        .volume-control {
+            flex: 1;
+            margin: 0 8px;
+        }
+        
+        .progress-container {
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: #007bff;
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.1s;
+        }
+        
+        .time-info {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+        
+        .playlist-compacta {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            background: white;
+        }
+        
+        .playlist-item-compacto {
+            padding: 8px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+        
+        .playlist-item-compacto:hover {
+            background: #f8f9fa;
+        }
+        
+        .playlist-item-compacto.playing {
+            background: #e3f2fd;
+            border-left: 3px solid #2196f3;
+        }
+        
+        .crossfader-compacto {
+            margin: 12px 0;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        .file-upload-compacto {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        
+        .file-upload-compacto input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-3">
+        <!-- Header Compacto -->
+        <div class="row">
+            <div class="col-12">
+                <h4 class="mb-3"><i class="fas fa-music me-2"></i>Player Compacto - Face a Face com Deus</h4>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Decks -->
+            <div class="col-lg-8">
+                <div class="row">
+                    <!-- Deck 1 -->
+                    <div class="col-md-6">
+                        <div class="deck-compacto" id="deck1">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Deck 1</h6>
+                                <div class="file-upload-compacto">
+                                    <input type="file" id="file1" accept="audio/*">
+                                    <label for="file1" class="btn btn-outline-primary btn-compacto">
+                                        <i class="fas fa-folder-open"></i>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-2">
+                                <small id="track1" class="text-muted">Nenhuma música carregada</small>
+                            </div>
+                            
+                            <div class="controls-compacto">
+                                <button class="btn btn-success btn-compacto" id="play1">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                                <input type="range" class="form-range volume-control" id="volume1" min="0" max="100" value="70">
+                                <small class="text-muted">70%</small>
+                            </div>
+                            
+                            <div class="progress-container" onclick="seekAudio(1, event)">
+                                <div class="progress-bar" id="progress1"></div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between time-info">
+                                <span id="currentTime1">0:00</span>
+                                <span id="duration1">0:00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Deck 2 -->
+                    <div class="col-md-6">
+                        <div class="deck-compacto" id="deck2">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Deck 2</h6>
+                                <div class="file-upload-compacto">
+                                    <input type="file" id="file2" accept="audio/*">
+                                    <label for="file2" class="btn btn-outline-primary btn-compacto">
+                                        <i class="fas fa-folder-open"></i>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-2">
+                                <small id="track2" class="text-muted">Nenhuma música carregada</small>
+                            </div>
+                            
+                            <div class="controls-compacto">
+                                <button class="btn btn-success btn-compacto" id="play2">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                                <input type="range" class="form-range volume-control" id="volume2" min="0" max="100" value="70">
+                                <small class="text-muted">70%</small>
+                            </div>
+                            
+                            <div class="progress-container" onclick="seekAudio(2, event)">
+                                <div class="progress-bar" id="progress2"></div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between time-info">
+                                <span id="currentTime2">0:00</span>
+                                <span id="duration2">0:00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Crossfader -->
+                    <div class="col-12">
+                        <div class="crossfader-compacto">
+                            <label class="form-label">Crossfader A/B</label>
+                            <input type="range" class="form-range" id="crossfader" min="0" max="100" value="50">
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">Deck 1</small>
+                                <small class="text-muted">Deck 2</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Playlist Compacta -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header py-2">
+                        <h6 class="mb-0">Playlist</h6>
+                    </div>
+                    <div class="card-body p-2">
+                        <!-- Controles da Playlist -->
+                        <div class="d-flex gap-1 mb-2">
+                            <button class="btn btn-primary btn-sm flex-fill" onclick="uploadPlaylist()">
+                                <i class="fas fa-upload"></i> Upload
+                            </button>
+                            <button class="btn btn-success btn-sm flex-fill" onclick="addManualTrack()">
+                                <i class="fas fa-plus"></i> Adicionar
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="clearPlaylist()">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+
+                        <!-- Lista de Músicas -->
+                        <div class="playlist-compacta" id="playlistContainer">
+                            <div class="text-center py-3">
+                                <i class="fas fa-music fa-2x text-muted mb-2"></i>
+                                <p class="text-muted mb-0 small">Playlist vazia</p>
+                            </div>
+                        </div>
+
+                        <!-- AutoMix Simples -->
+                        <div class="mt-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-outline-success btn-sm" id="btnAutoMix" onclick="toggleAutoMix()">
+                                    <i class="fas fa-play"></i> AutoMix
+                                </button>
+                                <select class="form-select form-select-sm flex-fill" id="autoMixMode">
+                                    <option value="sequence">Sequencial</option>
+                                    <option value="random">Aleatório</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sistema Simples e Funcional
+        let decks = {
+            1: { audio: null, playing: false },
+            2: { audio: null, playing: false }
+        };
+        let playlist = [];
+        let autoMixActive = false;
+        let autoMixInterval = null;
+        let currentTrack = 0;
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎵 Player Compacto Iniciado');
+            initializeFileInputs();
+            initializeVolumeControls();
+            initializeCrossfader();
+        });
+
+        // Inicializar inputs de arquivo
+        function initializeFileInputs() {
+            [1, 2].forEach(deckNum => {
+                const fileInput = document.getElementById(`file${deckNum}`);
+                const playBtn = document.getElementById(`play${deckNum}`);
+                
+                fileInput.addEventListener('change', (e) => loadAudioFile(deckNum, e.target.files[0]));
+                playBtn.addEventListener('click', () => togglePlay(deckNum));
+            });
+        }
+
+        // Carregar arquivo de áudio
+        function loadAudioFile(deckNum, file) {
+            if (!file || !file.type.startsWith('audio/')) {
+                alert('Selecione um arquivo de áudio válido.');
+                return;
+            }
+
+            console.log(`🎵 Carregando arquivo no Deck ${deckNum}: ${file.name}`);
+
+            // Limpar áudio anterior
+            if (decks[deckNum].audio) {
+                decks[deckNum].audio.pause();
+                URL.revokeObjectURL(decks[deckNum].audio.src);
+            }
+
+            const url = URL.createObjectURL(file);
+            const audio = new Audio(url);
+            
+            audio.addEventListener('loadedmetadata', () => {
+                console.log(`✅ Áudio carregado no Deck ${deckNum}`);
+                document.getElementById(`track${deckNum}`).textContent = file.name;
+                document.getElementById(`duration${deckNum}`).textContent = formatTime(audio.duration);
+            });
+
+            audio.addEventListener('timeupdate', () => {
+                updateProgress(deckNum, audio);
+            });
+
+            audio.addEventListener('ended', () => {
+                decks[deckNum].playing = false;
+                updatePlayButton(deckNum);
+                document.getElementById(`deck${deckNum}`).classList.remove('deck-playing');
+                
+                // AutoMix - tocar próxima
+                if (autoMixActive) {
+                    setTimeout(() => playNextTrack(), 1000);
+                }
+            });
+
+            audio.addEventListener('error', (e) => {
+                console.error(`❌ Erro ao carregar áudio no Deck ${deckNum}:`, e);
+                alert(`Erro ao carregar arquivo no Deck ${deckNum}`);
+            });
+
+            decks[deckNum].audio = audio;
+            updatePlayButton(deckNum);
+        }
+
+        // Tocar/Pausar
+        function togglePlay(deckNum) {
+            const deck = decks[deckNum];
+            
+            if (!deck.audio) {
+                alert(`Carregue uma música no Deck ${deckNum} primeiro.`);
+                return;
+            }
+
+            if (deck.playing) {
+                deck.audio.pause();
+                deck.playing = false;
+                document.getElementById(`deck${deckNum}`).classList.remove('deck-playing');
+            } else {
+                deck.audio.play().then(() => {
+                    deck.playing = true;
+                    document.getElementById(`deck${deckNum}`).classList.add('deck-playing');
+                }).catch(e => {
+                    console.error(`❌ Erro ao reproduzir Deck ${deckNum}:`, e);
+                    alert('Erro ao reproduzir. Tente novamente.');
+                });
+            }
+            
+            updatePlayButton(deckNum);
+        }
+
+        // Atualizar botão play
+        function updatePlayButton(deckNum) {
+            const btn = document.getElementById(`play${deckNum}`);
+            const icon = btn.querySelector('i');
+            
+            if (decks[deckNum].playing) {
+                icon.className = 'fas fa-pause';
+                btn.className = 'btn btn-warning btn-compacto';
+            } else {
+                icon.className = 'fas fa-play';
+                btn.className = 'btn btn-success btn-compacto';
+            }
+        }
+
+        // Atualizar progresso
+        function updateProgress(deckNum, audio) {
+            const progress = (audio.currentTime / audio.duration) * 100;
+            document.getElementById(`progress${deckNum}`).style.width = progress + '%';
+            document.getElementById(`currentTime${deckNum}`).textContent = formatTime(audio.currentTime);
+        }
+
+        // Buscar posição no áudio
+        function seekAudio(deckNum, event) {
+            const deck = decks[deckNum];
+            if (!deck.audio) return;
+
+            const rect = event.target.getBoundingClientRect();
+            const percent = (event.clientX - rect.left) / rect.width;
+            deck.audio.currentTime = percent * deck.audio.duration;
+        }
+
+        // Formatar tempo
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Controles de volume
+        function initializeVolumeControls() {
+            [1, 2].forEach(deckNum => {
+                const volumeControl = document.getElementById(`volume${deckNum}`);
+                volumeControl.addEventListener('input', (e) => {
+                    const volume = e.target.value / 100;
+                    if (decks[deckNum].audio) {
+                        decks[deckNum].audio.volume = volume;
+                    }
+                    e.target.nextElementSibling.textContent = e.target.value + '%';
+                });
+            });
+        }
+
+        // Crossfader
+        function initializeCrossfader() {
+            document.getElementById('crossfader').addEventListener('input', (e) => {
+                const value = e.target.value / 100;
+                
+                // Deck 1: volume diminui conforme crossfader vai para direita
+                if (decks[1].audio) {
+                    const volume1 = document.getElementById('volume1').value / 100;
+                    decks[1].audio.volume = volume1 * (1 - value);
+                }
+                
+                // Deck 2: volume aumenta conforme crossfader vai para direita
+                if (decks[2].audio) {
+                    const volume2 = document.getElementById('volume2').value / 100;
+                    decks[2].audio.volume = volume2 * value;
+                }
+            });
+        }
+
+        // === SISTEMA DE PLAYLIST SIMPLES ===
+
+        function uploadPlaylist() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.multiple = true;
+            input.accept = 'audio/*';
+            
+            input.onchange = (e) => {
+                const files = Array.from(e.target.files);
+                let count = 0;
+                
+                files.forEach(file => {
+                    if (file.type.startsWith('audio/')) {
+                        const trackName = file.name.replace(/\.[^/.]+$/, '');
+                        playlist.push({
+                            name: trackName,
+                            file: file,
+                            url: URL.createObjectURL(file)
+                        });
+                        count++;
+                    }
+                });
+                
+                renderPlaylist();
+                if (count > 0) {
+                    alert(`✅ ${count} música(s) adicionada(s)!`);
+                }
+            };
+            
+            input.click();
+        }
+
+        function addManualTrack() {
+            const name = prompt('Nome da música:');
+            if (name) {
+                playlist.push({
+                    name: name,
+                    file: null,
+                    url: null
+                });
+                renderPlaylist();
+            }
+        }
+
+        function clearPlaylist() {
+            if (confirm('Limpar toda a playlist?')) {
+                playlist.forEach(track => {
+                    if (track.url) URL.revokeObjectURL(track.url);
+                });
+                playlist = [];
+                currentTrack = 0;
+                renderPlaylist();
+            }
+        }
+
+        function renderPlaylist() {
+            const container = document.getElementById('playlistContainer');
+            
+            if (playlist.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-3">
+                        <i class="fas fa-music fa-2x text-muted mb-2"></i>
+                        <p class="text-muted mb-0 small">Playlist vazia</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            playlist.forEach((track, index) => {
+                const isPlaying = index === currentTrack;
+                const hasFile = track.file !== null;
+                
+                html += `
+                    <div class="playlist-item-compacto ${isPlaying ? 'playing' : ''}">
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-${hasFile ? 'music' : 'circle'} me-2 ${hasFile ? 'text-success' : 'text-muted'}"></i>
+                                <small class="flex-grow-1">${track.name}</small>
+                            </div>
+                        </div>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-primary btn-sm" onclick="loadTrackToPlaylist(${index})" title="Carregar arquivo">
+                                <i class="fas fa-upload"></i>
+                            </button>
+                            <button class="btn btn-outline-success btn-sm" onclick="playTrack(${index})" ${!hasFile ? 'disabled' : ''} title="Tocar">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="removeTrack(${index})" title="Remover">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function loadTrackToPlaylist(index) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'audio/*';
+            
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith('audio/')) {
+                    if (playlist[index].url) {
+                        URL.revokeObjectURL(playlist[index].url);
+                    }
+                    playlist[index].file = file;
+                    playlist[index].url = URL.createObjectURL(file);
+                    renderPlaylist();
+                    alert('✅ Arquivo carregado!');
+                }
+            };
+            
+            input.click();
+        }
+
+        function playTrack(index) {
+            if (!playlist[index] || !playlist[index].file) return;
+            
+            currentTrack = index;
+            
+            // Carregar no deck 1 (ou alternando entre decks)
+            loadAudioFile(1, playlist[index].file);
+            
+            setTimeout(() => {
+                togglePlay(1);
+            }, 500);
+            
+            renderPlaylist();
+        }
+
+        function removeTrack(index) {
+            if (playlist[index].url) {
+                URL.revokeObjectURL(playlist[index].url);
+            }
+            playlist.splice(index, 1);
+            if (currentTrack >= index) {
+                currentTrack = Math.max(0, currentTrack - 1);
+            }
+            renderPlaylist();
+        }
+
+        function toggleAutoMix() {
+            const btn = document.getElementById('btnAutoMix');
+            
+            if (autoMixActive) {
+                autoMixActive = false;
+                if (autoMixInterval) clearInterval(autoMixInterval);
+                btn.innerHTML = '<i class="fas fa-play"></i> AutoMix';
+                btn.className = 'btn btn-outline-success btn-sm';
+            } else {
+                if (playlist.filter(t => t.file).length === 0) {
+                    alert('Adicione músicas à playlist primeiro!');
+                    return;
+                }
+                
+                autoMixActive = true;
+                btn.innerHTML = '<i class="fas fa-stop"></i> Parar';
+                btn.className = 'btn btn-outline-danger btn-sm';
+                
+                // Tocar primeira música se nenhuma estiver tocando
+                if (!decks[1].playing && !decks[2].playing) {
+                    playNextTrack();
+                }
+            }
+        }
+
+        function playNextTrack() {
+            const availableTracks = playlist.filter(t => t.file);
+            if (availableTracks.length === 0) return;
+            
+            const mode = document.getElementById('autoMixMode').value;
+            
+            if (mode === 'random') {
+                const randomIndex = Math.floor(Math.random() * playlist.length);
+                if (playlist[randomIndex].file) {
+                    playTrack(randomIndex);
+                }
+            } else {
+                // Sequencial
+                let nextIndex = currentTrack + 1;
+                if (nextIndex >= playlist.length) nextIndex = 0;
+                
+                // Procurar próxima música com arquivo
+                for (let i = 0; i < playlist.length; i++) {
+                    if (playlist[nextIndex].file) {
+                        playTrack(nextIndex);
+                        break;
+                    }
+                    nextIndex = (nextIndex + 1) % playlist.length;
+                }
+            }
+        }
+
+        console.log('🎉 Player Compacto carregado com sucesso!');
+    </script>
+</body>
+</html>
