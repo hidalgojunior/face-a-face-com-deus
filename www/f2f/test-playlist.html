@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Playlist</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>Teste do Sistema de Playlist</h2>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5>Playlist <span id="playlistCount" class="badge bg-primary">0</span></h5>
+                <button class="btn btn-primary" onclick="uploadFiles()">Upload Múltiplo</button>
+                <button class="btn btn-success" onclick="addManual()">Adicionar Manual</button>
+                <button class="btn btn-info" onclick="loadExample()">Carregar Exemplo</button>
+            </div>
+            <div class="card-body">
+                <div id="playlistContainer">
+                    <!-- Lista será inserida aqui -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let playlist = [];
+
+        function renderPlaylist() {
+            console.log('Renderizando playlist com', playlist.length, 'itens');
+            const container = document.getElementById('playlistContainer');
+            
+            if (playlist.length === 0) {
+                container.innerHTML = '<p class="text-muted">Playlist vazia</p>';
+                document.getElementById('playlistCount').textContent = '0';
+                return;
+            }
+
+            let html = '';
+            playlist.forEach((track, index) => {
+                html += `
+                    <div class="border p-2 mb-2 rounded">
+                        <strong>${track.title}</strong><br>
+                        <small class="text-muted">${track.artist} - ${track.genre}</small>
+                        <div class="float-end">
+                            <button class="btn btn-sm btn-danger" onclick="removeTrack(${index})">Remover</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            document.getElementById('playlistCount').textContent = playlist.length;
+        }
+
+        function uploadFiles() {
+            console.log('Upload files clicado');
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'audio/*';
+            input.multiple = true;
+            
+            input.onchange = function(e) {
+                console.log('Arquivos selecionados:', e.target.files.length);
+                const files = Array.from(e.target.files);
+                
+                files.forEach(file => {
+                    if (file.type.startsWith('audio/')) {
+                        const fileName = file.name.replace(/\.[^/.]+$/, "");
+                        const parts = fileName.split(' - ');
+                        
+                        let title, artist;
+                        if (parts.length >= 2) {
+                            artist = parts[0].trim();
+                            title = parts[1].trim();
+                        } else {
+                            title = fileName;
+                            artist = 'Desconhecido';
+                        }
+                        
+                        playlist.push({
+                            title: title,
+                            artist: artist,
+                            genre: 'Upload'
+                        });
+                    }
+                });
+                
+                renderPlaylist();
+                alert(`${files.length} arquivo(s) adicionado(s)`);
+            };
+            
+            input.click();
+        }
+
+        function addManual() {
+            console.log('Adicionar manual clicado');
+            const title = prompt('Título da música:');
+            if (!title) return;
+            
+            const artist = prompt('Artista:') || 'Desconhecido';
+            
+            playlist.push({
+                title: title,
+                artist: artist,
+                genre: 'Manual'
+            });
+            
+            renderPlaylist();
+        }
+
+        function loadExample() {
+            console.log('Carregar exemplo clicado');
+            playlist = [
+                { title: 'Música 1', artist: 'Artista 1', genre: 'Exemplo' },
+                { title: 'Música 2', artist: 'Artista 2', genre: 'Exemplo' },
+                { title: 'Música 3', artist: 'Artista 3', genre: 'Exemplo' }
+            ];
+            renderPlaylist();
+        }
+
+        function removeTrack(index) {
+            console.log('Removendo música no índice', index);
+            playlist.splice(index, 1);
+            renderPlaylist();
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Página carregada, inicializando...');
+            renderPlaylist();
+        });
+    </script>
+</body>
+</html>

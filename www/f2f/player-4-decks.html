@@ -1493,10 +1493,15 @@
         }
 
         function renderPlaylist() {
+            console.log('renderPlaylist chamada, playlist tem', playlist.length, 'músicas');
             const container = document.getElementById('playlistContainer');
-            if (!container) return;
+            if (!container) {
+                console.error('Elemento playlistContainer não encontrado');
+                return;
+            }
 
             if (playlist.length === 0) {
+                console.log('Playlist vazia, mostrando mensagem padrão');
                 container.innerHTML = `
                     <div class="text-center py-4">
                         <i class="fas fa-music fa-3x text-muted mb-3"></i>
@@ -1512,6 +1517,7 @@
                         </div>
                     </div>
                 `;
+                updatePlaylistCount();
                 return;
             }
 
@@ -1560,6 +1566,7 @@
 
         function updatePlaylistCount() {
             const countElement = document.getElementById('playlistCount');
+            console.log('updatePlaylistCount chamada, elemento encontrado:', !!countElement);
             if (countElement) {
                 const loadedCount = playlist.filter(track => track.url).length;
                 const totalCount = playlist.length;
@@ -1628,14 +1635,27 @@
                             trackData.duration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
                             renderPlaylist();
                         });
+                        
+                        audio.addEventListener('error', (e) => {
+                            console.error('Erro ao carregar metadados do áudio:', file.name, e);
+                        });
+                        
+                        // Carregar o áudio para obter metadados
+                        audio.load();
+                    } else {
+                        console.warn('Arquivo não é de áudio:', file.name, file.type);
                     }
                 });
                 
-                setTimeout(() => {
-                    renderPlaylist();
+                // Renderizar imediatamente e depois novamente após carregar metadados
+                renderPlaylist();
+                
+                if (successCount > 0) {
                     alert(`✅ ${successCount} música(s) adicionada(s) com sucesso!`);
                     console.log(`Adicionadas ${successCount} músicas à playlist`);
-                }, 100);
+                } else {
+                    alert('❌ Nenhum arquivo de áudio válido foi selecionado.');
+                }
             };
             
             input.click();
@@ -1648,23 +1668,30 @@
             const artist = prompt('Nome do artista:') || 'Artista Desconhecido';
             const genre = prompt('Gênero musical:') || 'Personalizado';
             
-            playlist.push({
+            const newTrack = {
                 title: title,
                 artist: artist,
                 genre: genre,
                 duration: '0:00',
                 url: '',
                 isExample: false
-            });
+            };
+            
+            playlist.push(newTrack);
             
             renderPlaylist();
+            updateAutoMixStatus();
+            
             console.log('Música adicionada manualmente:', title, 'por', artist);
+            alert(`✅ Música "${title}" adicionada à playlist!`);
         }
 
         function loadExamplePlaylist() {
             if (confirm('Deseja carregar uma playlist de exemplo com músicas cristãs populares?')) {
                 playlist = [...examplePlaylist];
                 renderPlaylist();
+                updateAutoMixStatus();
+                console.log('Playlist de exemplo carregada:', playlist.length, 'músicas');
                 alert('✅ Playlist de exemplo carregada! Use os botões de upload para adicionar os arquivos de áudio.');
             }
         }
@@ -1712,11 +1739,34 @@
             input.onchange = function(e) {
                 const file = e.target.files[0];
                 if (file && file.type.startsWith('audio/')) {
+                    // Liberar URL anterior se existir
+                    if (playlist[index].url && !playlist[index].isExample) {
+                        URL.revokeObjectURL(playlist[index].url);
+                    }
+                    
                     const url = URL.createObjectURL(file);
                     playlist[index].url = url;
                     playlist[index].file = file;
+                    
+                    // Obter duração do arquivo
+                    const audio = new Audio(url);
+                    audio.addEventListener('loadedmetadata', () => {
+                        const minutes = Math.floor(audio.duration / 60);
+                        const seconds = Math.floor(audio.duration % 60);
+                        playlist[index].duration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                        renderPlaylist();
+                    });
+                    
+                    audio.addEventListener('error', (e) => {
+                        console.error('Erro ao carregar áudio:', file.name, e);
+                        alert('Erro ao carregar o arquivo de áudio. Tente novamente.');
+                    });
+                    
+                    audio.load();
                     renderPlaylist();
+                    
                     console.log(`Arquivo carregado para: ${playlist[index].title}`);
+                    alert(`✅ Arquivo "${file.name}" carregado para "${playlist[index].title}"`);
                 } else {
                     alert('Por favor, selecione um arquivo de áudio válido.');
                 }
@@ -1984,11 +2034,39 @@
             }
         }
 
+        // Função de teste para debug
+        function testPlaylistSystem() {
+            console.log('=== TESTE DO SISTEMA DE PLAYLIST ===');
+            console.log('Playlist atual:', playlist);
+            console.log('Elemento container:', document.getElementById('playlistContainer'));
+            console.log('Elemento counter:', document.getElementById('playlistCount'));
+            
+            // Testar adição manual
+            playlist.push({
+                title: 'Teste Música',
+                artist: 'Teste Artista',
+                genre: 'Teste',
+                duration: '3:45',
+                url: '',
+                isExample: false
+            });
+            
+            renderPlaylist();
+            console.log('Música de teste adicionada');
+        }
+
         // Inicializar verificação do sistema quando a página carregar
         document.addEventListener('DOMContentLoaded', function() {
-            checkSystemStatus();
-            loadPlaylist();
-            updateAutoMixStatus();
+            console.log('DOMContentLoaded - inicializando sistema...');
+            
+            // Aguardar um pouco para garantir que tudo está carregado
+            setTimeout(() => {
+                checkSystemStatus();
+                loadPlaylist();
+                updateAutoMixStatus();
+                console.log('Sistema inicializado com sucesso');
+                console.log('Para testar o sistema, abra o console e digite: testPlaylistSystem()');
+            }, 500);
         });
 
     </script>
