@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Sistema Ministerial - Face a Face com Deus</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+        .ministerial-header {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            border: 2px solid rgba(255, 193, 7, 0.3);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            margin: 30px 0;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        .section-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            margin: 25px 0;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+        .section-container:hover {
+            border-color: rgba(255, 193, 7, 0.5);
+            box-shadow: 0 10px 30px rgba(255, 193, 7, 0.2);
+        }
+        .ministerial-title {
+            background: linear-gradient(45deg, #ffc107, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            color: #ffc107;
+            font-weight: bold;
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255, 193, 7, 0.3);
+        }
+        .card-ministerial {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        .card-ministerial:hover {
+            transform: translateY(-5px);
+            border-color: #ffc107;
+            box-shadow: 0 10px 25px rgba(255, 193, 7, 0.3);
+        }
+        .badge-role {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+        }
+        .badge-status {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+        }
+        .btn-ministerial {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .btn-ministerial:hover {
+            background: linear-gradient(45deg, #764ba2, #667eea);
+            transform: scale(1.05);
+            color: white;
+        }
+        .stats-card {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid rgba(40, 167, 69, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .stats-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+        .form-ministerial {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        .nav-ministerial .nav-link {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            margin: 0 5px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .nav-ministerial .nav-link.active {
+            background: linear-gradient(45deg, #ffc107, #ff8c00);
+            border-color: #ffc107;
+            color: #000;
+            font-weight: bold;
+        }
+        .timeline-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #ffc107;
+            border-radius: 0 10px 10px 0;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        .avatar-ministerial {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            margin-right: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Header Ministerial -->
+        <div class="row">
+            <div class="col-12">
+                <div class="ministerial-header">
+                    <h1 class="ministerial-title">
+                        <i class="fas fa-hands-praying me-3"></i>
+                        Sistema Ministerial
+                    </h1>
+                    <p class="lead mb-4">Face a Face com Deus - Gestão Completa do Ministério</p>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="stats-number" id="totalMinistradores">12</div>
+                                <div>Ministradores</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="stats-number" id="totalEquipes">4</div>
+                                <div>Equipes</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="stats-number" id="totalEncontros">8</div>
+                                <div>Encontros</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="stats-number" id="totalEncontristas">156</div>
+                                <div>Encontristas</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu de Navegação -->
+        <div class="row">
+            <div class="col-12">
+                <ul class="nav nav-tabs nav-ministerial justify-content-center mb-4">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#ministradores" data-bs-toggle="tab">
+                            <i class="fas fa-user-tie me-2"></i>Ministradores
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#equipes" data-bs-toggle="tab">
+                            <i class="fas fa-users me-2"></i>Equipes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#encontros" data-bs-toggle="tab">
+                            <i class="fas fa-calendar-alt me-2"></i>Encontros
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#encontristas" data-bs-toggle="tab">
+                            <i class="fas fa-heart me-2"></i>Encontristas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#ministracoes" data-bs-toggle="tab">
+                            <i class="fas fa-microphone me-2"></i>Ministrações
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Conteúdo das Abas -->
+        <div class="tab-content">
+            <!-- Aba Ministradores -->
+            <div class="tab-pane fade show active" id="ministradores">
+                <div class="section-container">
+                    <h3 class="section-title">
+                        <i class="fas fa-user-tie me-2"></i>
+                        Gestão de Ministradores
+                    </h3>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <button class="btn btn-ministerial me-2" onclick="adicionarMinistrador()">
+                                <i class="fas fa-plus me-1"></i>Novo Ministrador
+                            </button>
+                            <button class="btn btn-outline-light" onclick="exportarMinistradores()">
+                                <i class="fas fa-download me-1"></i>Exportar Lista
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                <input type="text" class="form-control" placeholder="Buscar ministrador..." id="searchMinistrador" onkeyup="filtrarMinistradores()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" id="ministradoresContainer">
+                        <!-- Ministradores serão carregados aqui -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aba Equipes -->
+            <div class="tab-pane fade" id="equipes">
+                <div class="section-container">
+                    <h3 class="section-title">
+                        <i class="fas fa-users me-2"></i>
+                        Organização de Equipes
+                    </h3>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <button class="btn btn-ministerial me-2" onclick="criarEquipe()">
+                                <i class="fas fa-plus me-1"></i>Nova Equipe
+                            </button>
+                            <button class="btn btn-outline-light" onclick="organizarEquipes()">
+                                <i class="fas fa-sort me-1"></i>Reorganizar
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-control" id="filtroEquipes" onchange="filtrarEquipes()">
+                                <option value="">Todas as Equipes</option>
+                                <option value="ativa">Equipes Ativas</option>
+                                <option value="formacao">Em Formação</option>
+                                <option value="completa">Completas</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row" id="equipesContainer">
+                        <!-- Equipes serão carregadas aqui -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aba Encontros -->
+            <div class="tab-pane fade" id="encontros">
+                <div class="section-container">
+                    <h3 class="section-title">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        Gestão de Encontros
+                    </h3>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <button class="btn btn-ministerial me-2" onclick="agendarEncontro()">
+                                <i class="fas fa-plus me-1"></i>Agendar Encontro
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-control" id="filtroEncontros" onchange="filtrarEncontros()">
+                                <option value="">Todos os Encontros</option>
+                                <option value="proximos">Próximos</option>
+                                <option value="realizados">Realizados</option>
+                                <option value="planejamento">Em Planejamento</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="month" class="form-control" id="mesEncontros" onchange="filtrarPorMes()">
+                        </div>
+                    </div>
+
+                    <div id="encontrosContainer">
+                        <!-- Timeline de encontros será carregada aqui -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aba Encontristas -->
+            <div class="tab-pane fade" id="encontristas">
+                <div class="section-container">
+                    <h3 class="section-title">
+                        <i class="fas fa-heart me-2"></i>
+                        Cadastro de Encontristas
+                    </h3>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <button class="btn btn-ministerial me-2" onclick="cadastrarEncontrista()">
+                                <i class="fas fa-user-plus me-1"></i>Novo Encontrista
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-control" id="filtroEncontristas" onchange="filtrarEncontristas()">
+                                <option value="">Todos</option>
+                                <option value="ativo">Ativos</option>
+                                <option value="novo">Novos</option>
+                                <option value="veterano">Veteranos</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-control" id="filtroEncontro" onchange="filtrarPorEncontro()">
+                                <option value="">Por Encontro</option>
+                                <!-- Será populado dinamicamente -->
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" placeholder="Buscar encontrista..." id="searchEncontrista" onkeyup="buscarEncontristas()">
+                        </div>
+                    </div>
+
+                    <div class="row" id="encontristasContainer">
+                        <!-- Encontristas serão carregados aqui -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aba Ministrações -->
+            <div class="tab-pane fade" id="ministracoes">
+                <div class="section-container">
+                    <h3 class="section-title">
+                        <i class="fas fa-microphone me-2"></i>
+                        Sistema de Ministrações
+                    </h3>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <button class="btn btn-ministerial me-2" onclick="criarMinistracao()">
+                                <i class="fas fa-plus me-1"></i>Nova Ministração
+                            </button>
+                            <button class="btn btn-outline-light" onclick="bibliotecaMinistracao()">
+                                <i class="fas fa-book me-1"></i>Biblioteca
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-control" id="filtroMinistracao" onchange="filtrarMinistracoes()">
+                                <option value="">Todas as Ministrações</option>
+                                <option value="preparacao">Em Preparação</option>
+                                <option value="aprovada">Aprovadas</option>
+                                <option value="ministrada">Ministradas</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-control" id="temaMinisracao" onchange="filtrarPorTema()">
+                                <option value="">Por Tema</option>
+                                <option value="salvacao">Salvação</option>
+                                <option value="santificacao">Santificação</option>
+                                <option value="batismo">Batismo</option>
+                                <option value="dons">Dons Espirituais</option>
+                                <option value="oração">Oração</option>
+                                <option value="jejum">Jejum</option>
+                                <option value="libertacao">Libertação</option>
+                                <option value="cura">Cura e Milagres</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="ministracoesContainer">
+                        <!-- Ministrações serão carregadas aqui -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal para Formulários -->
+        <div class="modal fade" id="modalMinisterial" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content bg-dark text-white">
+                    <div class="modal-header border-secondary">
+                        <h5 class="modal-title" id="modalTitle">Título do Modal</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" id="modalBody">
+                        <!-- Conteúdo dinâmico -->
+                    </div>
+                    <div class="modal-footer border-secondary">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-ministerial" id="btnSalvar">Salvar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Dados do sistema ministerial
+        let ministradores = [
+            {
+                id: 1,
+                nome: "Pastor João Silva",
+                funcao: "Coordenador Geral",
+                especializacao: ["Libertação", "Cura", "Liderança"],
+                experiencia: "15 anos",
+                contato: "joao@f2f.com",
+                telefone: "(11) 99999-9999",
+                status: "ativo",
+                encontros: 45,
+                avatar: "JS"
+            },
+            {
+                id: 2,
+                nome: "Pastora Maria Santos",
+                funcao: "Coordenadora de Mulheres",
+                especializacao: ["Cura Interior", "Libertação Feminina", "Discipulado"],
+                experiencia: "12 anos",
+                contato: "maria@f2f.com",
+                telefone: "(11) 88888-8888",
+                status: "ativo",
+                encontros: 38,
+                avatar: "MS"
+            },
+            {
+                id: 3,
+                nome: "Pr. Carlos Oliveira",
+                funcao: "Ministrador Sênior",
+                especializacao: ["Salvação", "Batismo", "Dons Espirituais"],
+                experiencia: "10 anos",
+                contato: "carlos@f2f.com",
+                telefone: "(11) 77777-7777",
+                status: "ativo",
+                encontros: 32,
+                avatar: "CO"
+            }
+        ];
+
+        let equipes = [
+            {
+                id: 1,
+                nome: "Equipe Alpha",
+                coordenador: "Pastor João Silva",
+                membros: ["Maria Santos", "Carlos Oliveira", "Ana Costa", "Pedro Lima"],
+                status: "ativa",
+                proximoEncontro: "2025-09-15",
+                especializacao: "Encontros de Libertação"
+            },
+            {
+                id: 2,
+                nome: "Equipe Beta",
+                coordenador: "Pastora Maria Santos",
+                membros: ["João Silva", "Paulo Mendes", "Lucia Torres"],
+                status: "ativa",
+                proximoEncontro: "2025-09-22",
+                especializacao: "Encontros Femininos"
+            }
+        ];
+
+        let encontros = [
+            {
+                id: 1,
+                nome: "Encontro com Deus - Setembro",
+                data: "2025-09-15",
+                local: "Igreja Sede",
+                equipe: "Equipe Alpha",
+                coordenador: "Pastor João Silva",
+                tema: "Libertação e Cura",
+                inscritos: 45,
+                status: "agendado",
+                observacoes: "Encontro especial com foco em libertação"
+            },
+            {
+                id: 2,
+                nome: "Encontro Feminino - Outubro",
+                data: "2025-10-05",
+                local: "Centro de Convenções",
+                equipe: "Equipe Beta",
+                coordenador: "Pastora Maria Santos",
+                tema: "Mulher Virtuosa",
+                inscritos: 60,
+                status: "planejamento",
+                observacoes: "Encontro exclusivo para mulheres"
+            }
+        ];
+
+        let encontristas = [
+            {
+                id: 1,
+                nome: "Ana Paula Costa",
+                idade: 28,
+                telefone: "(11) 99999-1111",
+                email: "ana@email.com",
+                endereco: "São Paulo, SP",
+                igreja: "Igreja Sede",
+                encontros: ["Encontro com Deus - Setembro"],
+                status: "ativo",
+                observacoes: "Primeira participação"
+            },
+            {
+                id: 2,
+                nome: "Pedro Henrique Lima",
+                idade: 35,
+                telefone: "(11) 88888-2222",
+                email: "pedro@email.com",
+                endereco: "Guarulhos, SP",
+                igreja: "Filial Guarulhos",
+                encontros: ["Encontro com Deus - Setembro", "Encontro de Jovens"],
+                status: "veterano",
+                observacoes: "Participante assíduo"
+            }
+        ];
+
+        let ministracoes = [
+            {
+                id: 1,
+                titulo: "O Poder da Oração",
+                ministrador: "Pastor João Silva",
+                tema: "oração",
+                duracao: "45 minutos",
+                objetivos: ["Ensinar sobre oração eficaz", "Demonstrar poder da intercessão"],
+                estrutura: ["Introdução (10min)", "Desenvolvimento (25min)", "Ministração (10min)"],
+                recursos: ["Microfone", "Projetor", "Sistema de som"],
+                status: "aprovada",
+                encontros: ["Encontro com Deus - Setembro"],
+                observacoes: "Ministração com grande impacto"
+            },
+            {
+                id: 2,
+                titulo: "Cura Interior",
+                ministrador: "Pastora Maria Santos",
+                tema: "cura",
+                duracao: "60 minutos",
+                objetivos: ["Ministrar cura emocional", "Libertar de traumas"],
+                estrutura: ["Louvor (15min)", "Palavra (30min)", "Ministração (15min)"],
+                recursos: ["Sistema de som", "Cadeiras para ministração", "Óleo de unção"],
+                status: "preparacao",
+                encontros: ["Encontro Feminino - Outubro"],
+                observacoes: "Preparação especial necessária"
+            }
+        ];
+
+        // Inicializar sistema
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarMinistradores();
+            carregarEquipes();
+            carregarEncontros();
+            carregarEncontristas();
+            carregarMinistracoes();
+            atualizarEstatisticas();
+            console.log('🎯 Sistema Ministerial inicializado');
+        });
+
+        // Funções de carregamento
+        function carregarMinistradores() {
+            const container = document.getElementById('ministradoresContainer');
+            let html = '';
+
+            ministradores.forEach(ministrador => {
+                const statusClass = ministrador.status === 'ativo' ? 'bg-success' : 'bg-warning';
+                html += `
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card card-ministerial">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="avatar-ministerial">${ministrador.avatar}</div>
+                                    <div>
+                                        <h6 class="card-title mb-1">${ministrador.nome}</h6>
+                                        <small class="text-muted">${ministrador.funcao}</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    ${ministrador.especializacao.map(esp => 
+                                        `<span class="badge badge-role me-1 mb-1">${esp}</span>`
+                                    ).join('')}
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <small><i class="fas fa-calendar me-1"></i>${ministrador.experiencia}</small><br>
+                                    <small><i class="fas fa-users me-1"></i>${ministrador.encontros} encontros</small><br>
+                                    <small><i class="fas fa-phone me-1"></i>${ministrador.telefone}</small>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge badge-status ${statusClass}">${ministrador.status}</span>
+                                    <div>
+                                        <button class="btn btn-sm btn-outline-light me-1" onclick="editarMinistrador(${ministrador.id})" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-light" onclick="verMinistrador(${ministrador.id})" title="Detalhes">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function carregarEquipes() {
+            const container = document.getElementById('equipesContainer');
+            let html = '';
+
+            equipes.forEach(equipe => {
+                const statusClass = equipe.status === 'ativa' ? 'bg-success' : 'bg-warning';
+                html += `
+                    <div class="col-lg-6 col-md-12 mb-4">
+                        <div class="card card-ministerial">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h5 class="card-title text-warning">${equipe.nome}</h5>
+                                    <span class="badge badge-status ${statusClass}">${equipe.status}</span>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <small><i class="fas fa-user-tie me-1"></i><strong>Coordenador:</strong> ${equipe.coordenador}</small><br>
+                                    <small><i class="fas fa-calendar me-1"></i><strong>Próximo:</strong> ${new Date(equipe.proximoEncontro).toLocaleDateString('pt-BR')}</small><br>
+                                    <small><i class="fas fa-tag me-1"></i><strong>Especialização:</strong> ${equipe.especializacao}</small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <strong>Membros (${equipe.membros.length}):</strong><br>
+                                    ${equipe.membros.map(membro => 
+                                        `<span class="badge bg-secondary me-1 mb-1">${membro}</span>`
+                                    ).join('')}
+                                </div>
+                                
+                                <div class="d-flex justify-content-end">
+                                    <button class="btn btn-sm btn-outline-light me-1" onclick="editarEquipe(${equipe.id})" title="Editar Equipe">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-light me-1" onclick="gerenciarMembros(${equipe.id})" title="Gerenciar Membros">
+                                        <i class="fas fa-users"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-light" onclick="verEquipe(${equipe.id})" title="Detalhes">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function carregarEncontros() {
+            const container = document.getElementById('encontrosContainer');
+            let html = '';
+
+            encontros.forEach(encontro => {
+                const statusClass = {
+                    'agendado': 'bg-success',
+                    'planejamento': 'bg-warning',
+                    'realizado': 'bg-info'
+                }[encontro.status] || 'bg-secondary';
+
+                html += `
+                    <div class="timeline-item">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5 class="text-warning">${encontro.nome}</h5>
+                                <p class="mb-2">${encontro.tema}</p>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <small><i class="fas fa-calendar me-1"></i>${new Date(encontro.data).toLocaleDateString('pt-BR')}</small><br>
+                                        <small><i class="fas fa-map-marker-alt me-1"></i>${encontro.local}</small><br>
+                                        <small><i class="fas fa-users me-1"></i>${encontro.inscritos} inscritos</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <small><i class="fas fa-user-tie me-1"></i>${encontro.coordenador}</small><br>
+                                        <small><i class="fas fa-team me-1"></i>${encontro.equipe}</small>
+                                    </div>
+                                </div>
+                                ${encontro.observacoes ? `<p class="mt-2 text-muted"><i class="fas fa-sticky-note me-1"></i>${encontro.observacoes}</p>` : ''}
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <span class="badge badge-status ${statusClass} mb-3">${encontro.status}</span><br>
+                                <button class="btn btn-sm btn-outline-light me-1" onclick="editarEncontro(${encontro.id})" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-light me-1" onclick="gerenciarInscritos(${encontro.id})" title="Inscritos">
+                                    <i class="fas fa-list"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-light" onclick="verEncontro(${encontro.id})" title="Detalhes">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function carregarEncontristas() {
+            const container = document.getElementById('encontristasContainer');
+            let html = '';
+
+            encontristas.forEach(encontrista => {
+                const statusClass = {
+                    'ativo': 'bg-success',
+                    'novo': 'bg-info',
+                    'veterano': 'bg-warning'
+                }[encontrista.status] || 'bg-secondary';
+
+                html += `
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card card-ministerial">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h6 class="card-title">${encontrista.nome}</h6>
+                                    <span class="badge badge-status ${statusClass}">${encontrista.status}</span>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <small><i class="fas fa-birthday-cake me-1"></i>${encontrista.idade} anos</small><br>
+                                    <small><i class="fas fa-phone me-1"></i>${encontrista.telefone}</small><br>
+                                    <small><i class="fas fa-envelope me-1"></i>${encontrista.email}</small><br>
+                                    <small><i class="fas fa-church me-1"></i>${encontrista.igreja}</small><br>
+                                    <small><i class="fas fa-map-marker me-1"></i>${encontrista.endereco}</small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <strong>Encontros (${encontrista.encontros.length}):</strong><br>
+                                    ${encontrista.encontros.slice(0, 2).map(enc => 
+                                        `<span class="badge bg-secondary me-1 mb-1" style="font-size: 0.7em">${enc}</span>`
+                                    ).join('')}
+                                    ${encontrista.encontros.length > 2 ? `<span class="badge bg-info">+${encontrista.encontros.length - 2}</span>` : ''}
+                                </div>
+                                
+                                ${encontrista.observacoes ? `<p class="small text-muted">${encontrista.observacoes}</p>` : ''}
+                                
+                                <div class="d-flex justify-content-end">
+                                    <button class="btn btn-sm btn-outline-light me-1" onclick="editarEncontrista(${encontrista.id})" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-light me-1" onclick="historicoEncontrista(${encontrista.id})" title="Histórico">
+                                        <i class="fas fa-history"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-light" onclick="verEncontrista(${encontrista.id})" title="Detalhes">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function carregarMinistracoes() {
+            const container = document.getElementById('ministracoesContainer');
+            let html = '';
+
+            ministracoes.forEach(ministracao => {
+                const statusClass = {
+                    'preparacao': 'bg-warning',
+                    'aprovada': 'bg-success',
+                    'ministrada': 'bg-info'
+                }[ministracao.status] || 'bg-secondary';
+
+                html += `
+                    <div class="col-lg-6 col-md-12 mb-4">
+                        <div class="card card-ministerial">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h5 class="card-title text-warning">${ministracao.titulo}</h5>
+                                    <span class="badge badge-status ${statusClass}">${ministracao.status}</span>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <small><i class="fas fa-user me-1"></i><strong>Ministrador:</strong> ${ministracao.ministrador}</small><br>
+                                    <small><i class="fas fa-tag me-1"></i><strong>Tema:</strong> ${ministracao.tema}</small><br>
+                                    <small><i class="fas fa-clock me-1"></i><strong>Duração:</strong> ${ministracao.duracao}</small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <strong>Objetivos:</strong>
+                                    <ul class="small mb-2">
+                                        ${ministracao.objetivos.map(obj => `<li>${obj}</li>`).join('')}
+                                    </ul>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <strong>Encontros:</strong><br>
+                                    ${ministracao.encontros.map(enc => 
+                                        `<span class="badge bg-secondary me-1 mb-1">${enc}</span>`
+                                    ).join('')}
+                                </div>
+                                
+                                ${ministracao.observacoes ? `<p class="small text-muted">${ministracao.observacoes}</p>` : ''}
+                                
+                                <div class="d-flex justify-content-end">
+                                    <button class="btn btn-sm btn-outline-light me-1" onclick="editarMinistracao(${ministracao.id})" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-light me-1" onclick="duplicarMinistracao(${ministracao.id})" title="Duplicar">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-light" onclick="verMinistracao(${ministracao.id})" title="Detalhes">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function atualizarEstatisticas() {
+            document.getElementById('totalMinistradores').textContent = ministradores.length;
+            document.getElementById('totalEquipes').textContent = equipes.length;
+            document.getElementById('totalEncontros').textContent = encontros.length;
+            document.getElementById('totalEncontristas').textContent = encontristas.length;
+        }
+
+        // Funções de ação (placeholder - implementar conforme necessário)
+        function adicionarMinistrador() {
+            alert('Função: Adicionar Ministrador - A ser implementada');
+        }
+
+        function editarMinistrador(id) {
+            alert(`Função: Editar Ministrador ID ${id} - A ser implementada`);
+        }
+
+        function verMinistrador(id) {
+            alert(`Função: Ver Ministrador ID ${id} - A ser implementada`);
+        }
+
+        function criarEquipe() {
+            alert('Função: Criar Equipe - A ser implementada');
+        }
+
+        function agendarEncontro() {
+            alert('Função: Agendar Encontro - A ser implementada');
+        }
+
+        function cadastrarEncontrista() {
+            alert('Função: Cadastrar Encontrista - A ser implementada');
+        }
+
+        function criarMinistracao() {
+            alert('Função: Criar Ministração - A ser implementada');
+        }
+
+        // Funções de filtro (placeholder)
+        function filtrarMinistradores() {
+            console.log('Filtrar ministradores');
+        }
+
+        function filtrarEquipes() {
+            console.log('Filtrar equipes');
+        }
+
+        function filtrarEncontros() {
+            console.log('Filtrar encontros');
+        }
+
+        function filtrarEncontristas() {
+            console.log('Filtrar encontristas');
+        }
+
+        function filtrarMinistracoes() {
+            console.log('Filtrar ministrações');
+        }
+
+        console.log('🎯 Sistema Ministerial carregado!');
+    </script>
+</body>
+</html>

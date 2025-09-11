@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎵 Player Configurável - Face a Face com Deus</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+        .config-panel {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            border: 2px solid rgba(255, 193, 7, 0.3);
+            backdrop-filter: blur(15px);
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        .player-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            margin: 20px 0;
+            padding: 20px;
+        }
+        .deck-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .deck-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 193, 7, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .deck-container:hover::before {
+            opacity: 1;
+        }
+        .deck-container.playing {
+            border-color: #ffc107;
+            box-shadow: 0 0 25px rgba(255, 193, 7, 0.4);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 25px rgba(255, 193, 7, 0.4); }
+            50% { box-shadow: 0 0 35px rgba(255, 193, 7, 0.6); }
+            100% { box-shadow: 0 0 25px rgba(255, 193, 7, 0.4); }
+        }
+        .deck-title {
+            color: #ffc107;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .deck-number {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-right: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        .control-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        .deck-info {
+            font-size: 0.9em;
+            min-height: 50px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 15px 0;
+        }
+        .volume-control {
+            margin: 15px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+        }
+        .volume-display {
+            font-size: 0.9em;
+            color: #ffc107;
+            font-weight: bold;
+        }
+        .deck-selector {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            margin: 0 5px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        .deck-selector:hover {
+            background: linear-gradient(45deg, #764ba2, #667eea);
+            transform: scale(1.1);
+        }
+        .deck-selector.active {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            box-shadow: 0 0 15px rgba(40, 167, 69, 0.5);
+        }
+        .config-title {
+            background: linear-gradient(45deg, #ffc107, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        @media (max-width: 768px) {
+            .deck-container {
+                padding: 15px;
+                margin: 10px 0;
+            }
+            .control-buttons .btn {
+                padding: 0.375rem 0.5rem;
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="row">
+            <div class="col-12">
+                <div class="text-center py-4">
+                    <h1 class="config-title">
+                        <i class="fas fa-sliders-h me-3"></i>
+                        Player Configurável
+                    </h1>
+                    <p class="lead text-muted">Face a Face com Deus - Sistema Adaptável</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuração de Decks -->
+        <div class="row">
+            <div class="col-12">
+                <div class="config-panel">
+                    <h3><i class="fas fa-cog me-2"></i>Configuração de Decks</h3>
+                    <p class="text-muted mb-4">Escolha quantos decks você deseja usar (1 a 8)</p>
+                    
+                    <div class="text-center mb-4">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="deck-selector" onclick="setDeckCount(1)">1</button>
+                            <button type="button" class="deck-selector active" onclick="setDeckCount(2)">2</button>
+                            <button type="button" class="deck-selector" onclick="setDeckCount(3)">3</button>
+                            <button type="button" class="deck-selector" onclick="setDeckCount(4)">4</button>
+                            <button type="button" class="deck-selector" onclick="setDeckCount(5)">5</button>
+                            <button type="button" class="deck-selector" onclick="setDeckCount(6)">6</button>
+                            <button type="button" class="deck-selector" onclick="setDeckCount(7)">7</button>
+                            <button type="button" class="deck-selector" onclick="setDeckCount(8)">8</button>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Decks Ativos:</strong> <span id="deckCountDisplay">2</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-success me-2" onclick="testCurrentConfig()">
+                                <i class="fas fa-test-tube me-1"></i>Testar Configuração
+                            </button>
+                            <button class="btn btn-warning" onclick="resetAllDecks()">
+                                <i class="fas fa-refresh me-1"></i>Reset Geral
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controles Master -->
+        <div class="row">
+            <div class="col-12">
+                <div class="player-container">
+                    <h4><i class="fas fa-sliders-h me-2"></i>Controles Gerais</h4>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <button class="btn btn-success me-2" onclick="stopAll()">
+                                <i class="fas fa-stop me-1"></i>Parar Todos
+                            </button>
+                            <button class="btn btn-warning me-2" onclick="pauseAll()">
+                                <i class="fas fa-pause me-1"></i>Pausar Todos
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-info me-2" onclick="playAllAvailable()">
+                                <i class="fas fa-play me-1"></i>Tocar Disponíveis
+                            </button>
+                            <button class="btn btn-primary" onclick="loadRandomAll()">
+                                <i class="fas fa-random me-1"></i>Aleatório Geral
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center">
+                                <label class="me-2">Volume Master:</label>
+                                <input type="range" class="form-range" min="0" max="1" step="0.1" value="0.7" id="masterVolume" onchange="setMasterVolume(this.value)">
+                                <span class="ms-2 volume-display" id="masterVolumeDisplay">70%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Container dos Decks -->
+        <div class="row" id="decksContainer">
+            <!-- Os decks serão criados dinamicamente aqui -->
+        </div>
+
+        <!-- Playlist Configurável -->
+        <div class="row">
+            <div class="col-12">
+                <div class="player-container">
+                    <h4><i class="fas fa-list-music me-2"></i>Playlist Inteligente</h4>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <input type="file" class="form-control" id="playlistFiles" multiple accept="audio/*">
+                        </div>
+                        <div class="col-md-8">
+                            <button class="btn btn-success me-2" onclick="loadPlaylistFiles()">
+                                <i class="fas fa-plus me-1"></i>Adicionar Músicas
+                            </button>
+                            <button class="btn btn-warning me-2" onclick="fillAllDecks()">
+                                <i class="fas fa-forward me-1"></i>Preencher Decks Ativos
+                            </button>
+                            <button class="btn btn-info me-2" onclick="shufflePlaylist()">
+                                <i class="fas fa-shuffle me-1"></i>Embaralhar
+                            </button>
+                            <button class="btn btn-danger" onclick="clearPlaylist()">
+                                <i class="fas fa-trash me-1"></i>Limpar Tudo
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="alert alert-success" id="playlistStatus">
+                                <i class="fas fa-music me-2"></i>
+                                Playlist vazia - Adicione músicas para começar
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="playlistContainer" class="mt-3">
+                        <!-- Playlist será preenchida aqui -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuração global
+        let currentDeckCount = 2;
+        let decks = {};
+        let playlist = [];
+        let masterVolume = 0.7;
+
+        // Inicializar sistema
+        document.addEventListener('DOMContentLoaded', function() {
+            setDeckCount(2); // Começar com 2 decks
+            console.log('🎵 Player Configurável inicializado!');
+        });
+
+        // Configurar quantidade de decks
+        function setDeckCount(count) {
+            currentDeckCount = count;
+            console.log(`⚙️ Configurando ${count} deck(s)`);
+            
+            // Atualizar UI
+            document.getElementById('deckCountDisplay').textContent = count;
+            
+            // Atualizar botões
+            document.querySelectorAll('.deck-selector').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Recriar decks
+            createDecks(count);
+            
+            // Limpar decks não utilizados
+            for (let i = count + 1; i <= 8; i++) {
+                if (decks[i]) {
+                    if (decks[i].audio) {
+                        decks[i].audio.pause();
+                        URL.revokeObjectURL(decks[i].audio.src);
+                    }
+                    delete decks[i];
+                }
+            }
+        }
+
+        // Criar decks dinamicamente
+        function createDecks(count) {
+            const container = document.getElementById('decksContainer');
+            let html = '';
+            
+            // Calcular classes responsivas baseadas na quantidade
+            let colClass = 'col-12';
+            if (count <= 2) colClass = 'col-md-6';
+            else if (count <= 4) colClass = 'col-lg-3 col-md-6';
+            else if (count <= 6) colClass = 'col-xl-2 col-lg-4 col-md-6';
+            else colClass = 'col-xl-3 col-lg-4 col-md-6';
+
+            for (let i = 1; i <= count; i++) {
+                // Inicializar objeto do deck se não existir
+                if (!decks[i]) {
+                    decks[i] = { 
+                        audio: null, 
+                        isPlaying: false, 
+                        file: null,
+                        volume: 0.7
+                    };
+                }
+
+                html += `
+                    <div class="${colClass}">
+                        <div class="deck-container" id="deckContainer${i}">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="deck-number">${i}</div>
+                                <div>
+                                    <h5 class="deck-title mb-1">
+                                        <i class="fas fa-record-vinyl me-2"></i>Deck ${i}
+                                    </h5>
+                                    <span class="badge bg-secondary" id="deckStatus${i}">Vazio</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <input type="file" class="form-control form-control-sm" id="file${i}" accept="audio/*">
+                            </div>
+                            
+                            <div class="control-buttons">
+                                <button class="btn btn-primary" id="play${i}" onclick="togglePlay(${i})">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                                <button class="btn btn-secondary" onclick="stop(${i})">
+                                    <i class="fas fa-stop"></i>
+                                </button>
+                                <button class="btn btn-outline-light btn-sm" onclick="loadRandom(${i})" title="Música aleatória">
+                                    <i class="fas fa-dice"></i>
+                                </button>
+                                <button class="btn btn-outline-warning btn-sm" onclick="loadNext(${i})" title="Próxima da playlist">
+                                    <i class="fas fa-step-forward"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="volume-control">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-volume-up me-2"></i>
+                                    <input type="range" class="form-range" min="0" max="1" step="0.1" value="0.7" 
+                                           id="volume${i}" onchange="setVolume(${i}, this.value)">
+                                    <span class="ms-2 volume-display" id="volumeDisplay${i}">70%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="deck-info">
+                                <small id="info${i}" class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Nenhum arquivo carregado
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+
+            // Adicionar event listeners para os inputs de arquivo
+            for (let i = 1; i <= count; i++) {
+                const fileInput = document.getElementById(`file${i}`);
+                if (fileInput) {
+                    fileInput.addEventListener('change', (e) => {
+                        if (e.target.files[0]) {
+                            loadFile(i, e.target.files[0]);
+                        }
+                    });
+                }
+            }
+
+            console.log(`✅ ${count} deck(s) criado(s) com sucesso`);
+        }
+
+        // Carregar arquivo no deck
+        function loadFile(deckNumber, file) {
+            if (!file || !decks[deckNumber]) return;
+
+            console.log(`📁 Carregando arquivo no Deck ${deckNumber}:`, file.name);
+            
+            const deck = decks[deckNumber];
+            const url = URL.createObjectURL(file);
+            
+            // Limpar áudio anterior
+            if (deck.audio) {
+                deck.audio.pause();
+                URL.revokeObjectURL(deck.audio.src);
+            }
+            
+            // Criar novo elemento de áudio
+            deck.audio = new Audio(url);
+            deck.file = file;
+            deck.isPlaying = false;
+            deck.audio.volume = deck.volume * masterVolume;
+            
+            // Event listeners
+            deck.audio.addEventListener('ended', () => {
+                console.log(`🔄 Deck ${deckNumber} finalizou - carregando próxima`);
+                stop(deckNumber);
+                loadNext(deckNumber);
+            });
+
+            deck.audio.addEventListener('loadeddata', () => {
+                const duration = formatTime(deck.audio.duration);
+                document.getElementById(`info${deckNumber}`).innerHTML = `
+                    <i class="fas fa-music me-1"></i>
+                    <strong>${file.name}</strong><br>
+                    <small class="text-info">Duração: ${duration}</small>
+                `;
+            });
+            
+            // Atualizar interface
+            const statusBadge = document.getElementById(`deckStatus${deckNumber}`);
+            statusBadge.textContent = 'Carregado';
+            statusBadge.className = 'badge bg-success';
+            
+            // Reset botão play
+            const playBtn = document.getElementById(`play${deckNumber}`);
+            playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            playBtn.className = 'btn btn-primary';
+            
+            // Remover classe playing
+            document.getElementById(`deckContainer${deckNumber}`).classList.remove('playing');
+            
+            console.log(`✅ Arquivo carregado no Deck ${deckNumber}`);
+        }
+
+        // Alternar play/pause
+        function togglePlay(deckNumber) {
+            const deck = decks[deckNumber];
+            if (!deck) return;
+            
+            const playBtn = document.getElementById(`play${deckNumber}`);
+            const statusBadge = document.getElementById(`deckStatus${deckNumber}`);
+            const container = document.getElementById(`deckContainer${deckNumber}`);
+            
+            if (!deck.audio) {
+                alert(`Carregue um arquivo no Deck ${deckNumber} primeiro!`);
+                return;
+            }
+            
+            if (deck.isPlaying) {
+                deck.audio.pause();
+                deck.isPlaying = false;
+                playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                playBtn.className = 'btn btn-primary';
+                statusBadge.textContent = 'Pausado';
+                statusBadge.className = 'badge bg-warning';
+                container.classList.remove('playing');
+                console.log(`⏸️ Deck ${deckNumber} pausado`);
+            } else {
+                deck.audio.play();
+                deck.isPlaying = true;
+                playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                playBtn.className = 'btn btn-warning';
+                statusBadge.textContent = 'Tocando';
+                statusBadge.className = 'badge bg-success';
+                container.classList.add('playing');
+                console.log(`▶️ Deck ${deckNumber} tocando`);
+            }
+        }
+
+        // Parar reprodução
+        function stop(deckNumber) {
+            const deck = decks[deckNumber];
+            if (!deck || !deck.audio) return;
+            
+            deck.audio.pause();
+            deck.audio.currentTime = 0;
+            deck.isPlaying = false;
+            
+            const playBtn = document.getElementById(`play${deckNumber}`);
+            const statusBadge = document.getElementById(`deckStatus${deckNumber}`);
+            const container = document.getElementById(`deckContainer${deckNumber}`);
+            
+            playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            playBtn.className = 'btn btn-primary';
+            statusBadge.textContent = deck.file ? 'Carregado' : 'Vazio';
+            statusBadge.className = deck.file ? 'badge bg-success' : 'badge bg-secondary';
+            container.classList.remove('playing');
+            
+            console.log(`⏹️ Deck ${deckNumber} parado`);
+        }
+
+        // Definir volume do deck
+        function setVolume(deckNumber, volume) {
+            const deck = decks[deckNumber];
+            if (!deck) return;
+            
+            deck.volume = parseFloat(volume);
+            
+            if (deck.audio) {
+                deck.audio.volume = deck.volume * masterVolume;
+            }
+            
+            document.getElementById(`volumeDisplay${deckNumber}`).textContent = `${Math.round(volume * 100)}%`;
+            console.log(`🔊 Volume Deck ${deckNumber}: ${Math.round(volume * 100)}%`);
+        }
+
+        // Volume master
+        function setMasterVolume(volume) {
+            masterVolume = parseFloat(volume);
+            document.getElementById('masterVolumeDisplay').textContent = `${Math.round(volume * 100)}%`;
+            
+            // Atualizar volume de todos os decks ativos
+            for (let i = 1; i <= currentDeckCount; i++) {
+                if (decks[i] && decks[i].audio) {
+                    decks[i].audio.volume = decks[i].volume * masterVolume;
+                }
+            }
+            
+            console.log(`🔊 Volume Master: ${Math.round(volume * 100)}%`);
+        }
+
+        // Controles gerais
+        function stopAll() {
+            for (let i = 1; i <= currentDeckCount; i++) {
+                stop(i);
+            }
+            console.log('⏹️ Todos os decks parados');
+        }
+
+        function pauseAll() {
+            let pausedCount = 0;
+            for (let i = 1; i <= currentDeckCount; i++) {
+                if (decks[i] && decks[i].isPlaying) {
+                    togglePlay(i);
+                    pausedCount++;
+                }
+            }
+            console.log(`⏸️ ${pausedCount} deck(s) pausado(s)`);
+        }
+
+        function playAllAvailable() {
+            let playedCount = 0;
+            for (let i = 1; i <= currentDeckCount; i++) {
+                if (decks[i] && decks[i].audio && !decks[i].isPlaying) {
+                    togglePlay(i);
+                    playedCount++;
+                }
+            }
+            console.log(`▶️ ${playedCount} deck(s) iniciado(s)`);
+        }
+
+        function loadRandomAll() {
+            if (playlist.length === 0) {
+                alert('Playlist vazia! Adicione músicas primeiro.');
+                return;
+            }
+            
+            for (let i = 1; i <= currentDeckCount; i++) {
+                loadRandom(i);
+            }
+        }
+
+        function resetAllDecks() {
+            stopAll();
+            
+            for (let i = 1; i <= currentDeckCount; i++) {
+                if (decks[i] && decks[i].audio) {
+                    URL.revokeObjectURL(decks[i].audio.src);
+                    decks[i].audio = null;
+                    decks[i].file = null;
+                }
+                
+                const fileInput = document.getElementById(`file${i}`);
+                if (fileInput) fileInput.value = '';
+                
+                const info = document.getElementById(`info${i}`);
+                if (info) info.innerHTML = '<i class="fas fa-info-circle me-1"></i>Nenhum arquivo carregado';
+                
+                const status = document.getElementById(`deckStatus${i}`);
+                if (status) {
+                    status.textContent = 'Vazio';
+                    status.className = 'badge bg-secondary';
+                }
+            }
+            
+            console.log('🔄 Reset completo realizado');
+        }
+
+        // Funções da playlist
+        function loadRandom(deckNumber) {
+            if (playlist.length === 0) {
+                alert('Playlist vazia! Adicione músicas primeiro.');
+                return;
+            }
+            
+            const randomIndex = Math.floor(Math.random() * playlist.length);
+            const track = playlist[randomIndex];
+            
+            console.log(`🎲 Carregando música aleatória no Deck ${deckNumber}: ${track.title}`);
+            loadFile(deckNumber, track.file);
+        }
+
+        function loadNext(deckNumber) {
+            if (playlist.length === 0) return;
+            
+            const nextIndex = Math.floor(Math.random() * playlist.length);
+            const track = playlist[nextIndex];
+            
+            console.log(`⏭️ Carregando próxima música no Deck ${deckNumber}: ${track.title}`);
+            loadFile(deckNumber, track.file);
+        }
+
+        function loadPlaylistFiles() {
+            const files = document.getElementById('playlistFiles').files;
+            
+            if (files.length === 0) {
+                alert('Selecione arquivos de áudio primeiro!');
+                return;
+            }
+            
+            console.log(`📋 Carregando ${files.length} arquivo(s) na playlist`);
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                playlist.push({
+                    id: playlist.length,
+                    title: file.name.replace(/\.[^/.]+$/, ""),
+                    artist: "Artista Desconhecido",
+                    file: file
+                });
+            }
+            
+            renderPlaylist();
+            console.log(`✅ Playlist atualizada com ${playlist.length} música(s)`);
+        }
+
+        function fillAllDecks() {
+            if (playlist.length === 0) {
+                alert('Playlist vazia!');
+                return;
+            }
+            
+            console.log(`🎵 Preenchendo ${currentDeckCount} deck(s) ativos...`);
+            
+            stopAll();
+            
+            for (let i = 1; i <= currentDeckCount; i++) {
+                if (playlist.length > 0) {
+                    const trackIndex = (i - 1) % playlist.length;
+                    setTimeout(() => {
+                        loadFile(i, playlist[trackIndex].file);
+                        
+                        setTimeout(() => {
+                            if (decks[i] && decks[i].audio) {
+                                togglePlay(i);
+                            }
+                        }, 500);
+                    }, i * 300);
+                }
+            }
+        }
+
+        function shufflePlaylist() {
+            for (let i = playlist.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [playlist[i], playlist[j]] = [playlist[j], playlist[i]];
+            }
+            renderPlaylist();
+            console.log('🔀 Playlist embaralhada');
+        }
+
+        function clearPlaylist() {
+            playlist = [];
+            renderPlaylist();
+            document.getElementById('playlistFiles').value = '';
+            console.log('🗑️ Playlist limpa');
+        }
+
+        function renderPlaylist() {
+            const container = document.getElementById('playlistContainer');
+            const status = document.getElementById('playlistStatus');
+            
+            if (playlist.length === 0) {
+                container.innerHTML = '';
+                status.innerHTML = '<i class="fas fa-music me-2"></i>Playlist vazia - Adicione músicas para começar';
+                status.className = 'alert alert-success';
+                return;
+            }
+            
+            status.innerHTML = `<i class="fas fa-list-music me-2"></i>${playlist.length} música(s) | ${currentDeckCount} deck(s) ativos`;
+            status.className = 'alert alert-info';
+            
+            let html = '<div class="row">';
+            
+            playlist.forEach((track, index) => {
+                html += `
+                    <div class="col-md-6 col-lg-4 col-xl-3 mb-3">
+                        <div class="card bg-dark text-white">
+                            <div class="card-body p-3">
+                                <h6 class="card-title mb-2">${track.title}</h6>
+                                <p class="card-text small text-muted mb-3">${track.artist}</p>
+                                <div class="btn-group w-100" role="group">
+                                    <button class="btn btn-sm btn-success" onclick="playFromPlaylist(${index})" title="Tocar em deck disponível">
+                                        <i class="fas fa-play"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-primary" onclick="loadToAvailableDeck(${index})" title="Carregar em deck disponível">
+                                        <i class="fas fa-upload"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="removeFromPlaylist(${index})" title="Remover da playlist">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function findAvailableDeck() {
+            for (let i = 1; i <= currentDeckCount; i++) {
+                if (decks[i] && !decks[i].isPlaying) {
+                    console.log(`✅ Deck ${i} disponível`);
+                    return i;
+                }
+            }
+            
+            console.log('⚠️ Todos os decks ocupados, usando Deck 1');
+            return 1;
+        }
+
+        function loadToAvailableDeck(index) {
+            const track = playlist[index];
+            const deckNumber = findAvailableDeck();
+            
+            console.log(`🎵 Carregando "${track.title}" no Deck ${deckNumber}`);
+            loadFile(deckNumber, track.file);
+        }
+
+        function playFromPlaylist(index) {
+            const track = playlist[index];
+            const deckNumber = findAvailableDeck();
+            
+            console.log(`🎵 Tocando "${track.title}" no Deck ${deckNumber}`);
+            
+            if (decks[deckNumber] && decks[deckNumber].isPlaying) {
+                stop(deckNumber);
+            }
+            
+            loadFile(deckNumber, track.file);
+            
+            setTimeout(() => {
+                togglePlay(deckNumber);
+            }, 500);
+        }
+
+        function removeFromPlaylist(index) {
+            playlist.splice(index, 1);
+            renderPlaylist();
+            console.log(`🗑️ Música removida da playlist`);
+        }
+
+        function testCurrentConfig() {
+            console.log('🔧 === TESTE DA CONFIGURAÇÃO ATUAL ===');
+            
+            console.log(`⚙️ Configuração: ${currentDeckCount} deck(s) ativo(s)`);
+            
+            let playingCount = 0;
+            let loadedCount = 0;
+            
+            for (let i = 1; i <= currentDeckCount; i++) {
+                if (decks[i]) {
+                    if (decks[i].audio) loadedCount++;
+                    if (decks[i].isPlaying) playingCount++;
+                    
+                    console.log(`🎛️ Deck ${i}:`, {
+                        hasAudio: !!decks[i].audio,
+                        isPlaying: decks[i].isPlaying,
+                        hasFile: !!decks[i].file,
+                        volume: `${Math.round(decks[i].volume * 100)}%`
+                    });
+                }
+            }
+            
+            console.log(`📊 Resumo: ${loadedCount}/${currentDeckCount} carregados, ${playingCount}/${currentDeckCount} tocando`);
+            console.log(`📋 Playlist: ${playlist.length} música(s)`);
+            
+            if (playlist.length >= currentDeckCount) {
+                console.log('🎵 Testando preenchimento automático...');
+                fillAllDecks();
+            } else if (playlist.length > 0) {
+                console.log('🎵 Testando primeira música...');
+                playFromPlaylist(0);
+            } else {
+                console.log('❌ Adicione músicas à playlist primeiro');
+            }
+            
+            console.log('🔧 === FIM DO TESTE ===');
+        }
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '00:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Atalhos de teclado
+        document.addEventListener('keydown', function(e) {
+            if (e.target.tagName === 'INPUT') return;
+            
+            // Números 1-8 para selecionar decks
+            if (e.key >= '1' && e.key <= '8') {
+                const deckNum = parseInt(e.key);
+                if (deckNum <= currentDeckCount) {
+                    setDeckCount(deckNum);
+                }
+            }
+            
+            // Espaço para pausar/tocar todos
+            if (e.code === 'Space') {
+                e.preventDefault();
+                pauseAll();
+            }
+            
+            // S para parar todos
+            if (e.key.toLowerCase() === 's') {
+                stopAll();
+            }
+        });
+
+        console.log('🎵 Player Configurável carregado!');
+        console.log('⌨️ Atalhos: 1-8 (configurar decks), Espaço (pausar/tocar), S (parar todos)');
+    </script>
+</body>
+</html>
