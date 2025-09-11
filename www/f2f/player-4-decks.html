@@ -1324,58 +1324,12 @@
         
         // Inicializar sistema
         document.addEventListener('DOMContentLoaded', () => {
-            // Variáveis globais da playlist
+            // SISTEMA DE PLAYLIST - VERSÃO FUNCIONAL
+            let playlist = [];
             let autoMixPlaylistActive = false;
             let autoMixInterval = null;
             let currentPlaylistIndex = 0;
             let currentDeck = 1;
-
-            // Lista de músicas personalizada (inicialmente vazia)
-            let playlist = [];
-            
-            // Lista de músicas exemplo (opcional para demonstração)
-            let examplePlaylist = [
-                {
-                    title: "Rude Cruz",
-                    artist: "Hinário Adventista",
-                    genre: "Hino",
-                    duration: "4:30",
-                    url: "",
-                    isExample: true
-                },
-                {
-                    title: "Amazing Grace", 
-                    artist: "Traditional",
-                    genre: "Hino",
-                    duration: "4:15",
-                    url: "",
-                    isExample: true
-                },
-                {
-                    title: "Como é Grande o Meu Deus",
-                    artist: "Hillsong",
-                    genre: "Contemporary", 
-                    duration: "5:20",
-                    url: "",
-                    isExample: true
-                },
-                {
-                    title: "Oceanos",
-                    artist: "Hillsong United",
-                    genre: "Contemporary",
-                    duration: "6:45", 
-                    url: "",
-                    isExample: true
-                },
-                {
-                    title: "Tua Graça me Basta",
-                    artist: "Fernandinho",
-                    genre: "Gospel",
-                    duration: "4:50",
-                    url: "",
-                    isExample: true
-                }
-            ];
 
             // Criar os 4 decks
             const deck1 = new Deck(1);
@@ -1487,21 +1441,22 @@
         });
         
         console.log('🎵 Player 4 Decks - Face a Face com Deus inicializado com sucesso!');
-        // Funções da Playlist AutoMix
+        // FUNÇÕES DA PLAYLIST - VERSÃO FUNCIONAL
         function loadPlaylist() {
+            console.log('🎵 Carregando playlist...');
             renderPlaylist();
         }
 
         function renderPlaylist() {
-            console.log('renderPlaylist chamada, playlist tem', playlist.length, 'músicas');
+            console.log('🔄 Renderizando playlist com', playlist.length, 'músicas');
             const container = document.getElementById('playlistContainer');
+            
             if (!container) {
-                console.error('Elemento playlistContainer não encontrado');
+                console.error('❌ Elemento playlistContainer não encontrado!');
                 return;
             }
 
             if (playlist.length === 0) {
-                console.log('Playlist vazia, mostrando mensagem padrão');
                 container.innerHTML = `
                     <div class="text-center py-4">
                         <i class="fas fa-music fa-3x text-muted mb-3"></i>
@@ -1527,6 +1482,7 @@
                 const statusClass = isLoaded ? 'text-success' : 'text-muted';
                 const statusIcon = isLoaded ? 'fas fa-check-circle' : 'fas fa-circle';
                 const isExample = track.isExample ? '<span class="badge bg-info ms-2">Exemplo</span>' : '';
+                const isCurrent = index === currentPlaylistIndex ? '<span class="badge bg-primary ms-2">Atual</span>' : '';
                 
                 html += `
                     <div class="playlist-item mb-2 p-2 border rounded ${index === currentPlaylistIndex ? 'bg-light' : ''}">
@@ -1535,7 +1491,7 @@
                                 <div class="d-flex align-items-center mb-1">
                                     <i class="${statusIcon} ${statusClass} me-2"></i>
                                     <strong>${track.title}</strong>
-                                    ${index === currentPlaylistIndex ? '<span class="badge bg-primary ms-2">Atual</span>' : ''}
+                                    ${isCurrent}
                                     ${isExample}
                                 </div>
                                 <small class="text-muted d-block">
@@ -1543,13 +1499,13 @@
                                 </small>
                             </div>
                             <div class="btn-group btn-group-sm">
-                                <button class="btn btn-outline-primary btn-sm" onclick="loadTrackToPlaylist(${index})" title="Carregar arquivo de áudio">
+                                <button class="btn btn-outline-primary btn-sm" onclick="loadTrackToPlaylist(${index})" title="Carregar arquivo">
                                     <i class="fas fa-upload"></i>
                                 </button>
-                                <button class="btn btn-outline-success btn-sm" onclick="playTrackFromPlaylist(${index})" ${!isLoaded ? 'disabled' : ''} title="Reproduzir música">
+                                <button class="btn btn-outline-success btn-sm" onclick="playTrackFromPlaylist(${index})" ${!isLoaded ? 'disabled' : ''} title="Reproduzir">
                                     <i class="fas fa-play"></i>
                                 </button>
-                                <button class="btn btn-outline-danger btn-sm" onclick="removeFromPlaylist(${index})" title="Remover da playlist">
+                                <button class="btn btn-outline-danger btn-sm" onclick="removeFromPlaylist(${index})" title="Remover">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -1559,32 +1515,38 @@
             });
             
             container.innerHTML = html;
-            
-            // Atualizar contador de músicas
             updatePlaylistCount();
+            console.log('✅ Playlist renderizada com sucesso');
         }
 
         function updatePlaylistCount() {
             const countElement = document.getElementById('playlistCount');
-            console.log('updatePlaylistCount chamada, elemento encontrado:', !!countElement);
-            if (countElement) {
-                const loadedCount = playlist.filter(track => track.url).length;
-                const totalCount = playlist.length;
-                
-                if (totalCount === 0) {
-                    countElement.textContent = 'Vazia';
-                    countElement.className = 'badge bg-secondary';
-                } else if (loadedCount === totalCount) {
-                    countElement.textContent = `${totalCount} música${totalCount > 1 ? 's' : ''} (todas prontas)`;
-                    countElement.className = 'badge bg-success';
-                } else {
-                    countElement.textContent = `${loadedCount}/${totalCount} música${totalCount > 1 ? 's' : ''} carregada${loadedCount !== 1 ? 's' : ''}`;
-                    countElement.className = 'badge bg-warning';
-                }
+            
+            if (!countElement) {
+                console.error('❌ Elemento playlistCount não encontrado');
+                return;
             }
+            
+            const loadedCount = playlist.filter(track => track.url && track.url !== '').length;
+            const totalCount = playlist.length;
+            
+            if (totalCount === 0) {
+                countElement.textContent = 'Vazia';
+                countElement.className = 'badge bg-secondary';
+            } else if (loadedCount === totalCount) {
+                countElement.textContent = `${totalCount} música${totalCount > 1 ? 's' : ''} (prontas)`;
+                countElement.className = 'badge bg-success';
+            } else {
+                countElement.textContent = `${loadedCount}/${totalCount} carregada${loadedCount !== 1 ? 's' : ''}`;
+                countElement.className = 'badge bg-warning';
+            }
+            
+            console.log(`📊 Contador atualizado: ${loadedCount}/${totalCount}`);
         }
 
         function uploadMultipleFiles() {
+            console.log('🎵 Iniciando upload múltiplo...');
+            
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = 'audio/*';
@@ -1592,20 +1554,26 @@
             
             input.onchange = function(e) {
                 const files = Array.from(e.target.files);
+                console.log(`📁 ${files.length} arquivo(s) selecionado(s)`);
+                
+                if (files.length === 0) {
+                    console.log('❌ Nenhum arquivo selecionado');
+                    return;
+                }
+                
                 let successCount = 0;
                 
-                if (files.length === 0) return;
-                
                 files.forEach((file, index) => {
+                    console.log(`🎧 Processando: ${file.name} (${file.type})`);
+                    
                     if (file.type.startsWith('audio/')) {
-                        // Extrair informações do arquivo
-                        const fileName = file.name.replace(/\.[^/.]+$/, ""); // Remove extensão
+                        const fileName = file.name.replace(/\.[^/.]+$/, "");
                         const parts = fileName.split(' - ');
                         
                         let title, artist;
                         if (parts.length >= 2) {
                             artist = parts[0].trim();
-                            title = parts[1].trim();
+                            title = parts.slice(1).join(' - ').trim();
                         } else {
                             title = fileName;
                             artist = 'Artista Desconhecido';
@@ -1613,8 +1581,8 @@
                         
                         const url = URL.createObjectURL(file);
                         
-                        // Criar entrada na playlist
                         const trackData = {
+                            id: Date.now() + index,
                             title: title,
                             artist: artist,
                             genre: 'Sua Música',
@@ -1627,7 +1595,9 @@
                         playlist.push(trackData);
                         successCount++;
                         
-                        // Tentar obter duração do arquivo
+                        console.log(`✅ Adicionada: ${title} - ${artist}`);
+                        
+                        // Obter duração do arquivo
                         const audio = new Audio(url);
                         audio.addEventListener('loadedmetadata', () => {
                             const minutes = Math.floor(audio.duration / 60);
@@ -1637,63 +1607,160 @@
                         });
                         
                         audio.addEventListener('error', (e) => {
-                            console.error('Erro ao carregar metadados do áudio:', file.name, e);
+                            console.error('❌ Erro ao carregar:', file.name, e);
                         });
                         
-                        // Carregar o áudio para obter metadados
                         audio.load();
                     } else {
-                        console.warn('Arquivo não é de áudio:', file.name, file.type);
+                        console.warn(`❌ Arquivo inválido: ${file.name} (${file.type})`);
                     }
                 });
                 
-                // Renderizar imediatamente e depois novamente após carregar metadados
+                // Renderizar imediatamente
                 renderPlaylist();
                 
-                if (successCount > 0) {
-                    alert(`✅ ${successCount} música(s) adicionada(s) com sucesso!`);
-                    console.log(`Adicionadas ${successCount} músicas à playlist`);
-                } else {
-                    alert('❌ Nenhum arquivo de áudio válido foi selecionado.');
-                }
+                // Feedback para o usuário
+                setTimeout(() => {
+                    if (successCount > 0) {
+                        alert(`✅ ${successCount} música(s) adicionada(s) com sucesso!`);
+                        console.log(`🎉 Upload concluído: ${successCount} músicas adicionadas`);
+                    } else {
+                        alert('❌ Nenhum arquivo de áudio válido foi selecionado.');
+                        console.log('❌ Nenhum arquivo válido processado');
+                    }
+                }, 100);
             };
             
             input.click();
         }
 
         function addCustomTrack() {
-            const title = prompt('Nome da música:');
-            if (!title) return;
+            console.log('✏️ Adicionando música manual...');
             
-            const artist = prompt('Nome do artista:') || 'Artista Desconhecido';
-            const genre = prompt('Gênero musical:') || 'Personalizado';
+            const title = prompt('Digite o título da música:');
+            if (!title) {
+                console.log('❌ Cancelado pelo usuário');
+                return;
+            }
+            
+            const artist = prompt('Digite o nome do artista:') || 'Artista Desconhecido';
+            const genre = prompt('Digite o gênero musical:') || 'Personalizado';
             
             const newTrack = {
+                id: Date.now(),
                 title: title,
                 artist: artist,
                 genre: genre,
                 duration: '0:00',
                 url: '',
+                file: null,
                 isExample: false
             };
             
             playlist.push(newTrack);
-            
             renderPlaylist();
             updateAutoMixStatus();
             
-            console.log('Música adicionada manualmente:', title, 'por', artist);
+            console.log(`✅ Música adicionada: ${title} - ${artist}`);
             alert(`✅ Música "${title}" adicionada à playlist!`);
         }
 
         function loadExamplePlaylist() {
-            if (confirm('Deseja carregar uma playlist de exemplo com músicas cristãs populares?')) {
-                playlist = [...examplePlaylist];
-                renderPlaylist();
-                updateAutoMixStatus();
-                console.log('Playlist de exemplo carregada:', playlist.length, 'músicas');
-                alert('✅ Playlist de exemplo carregada! Use os botões de upload para adicionar os arquivos de áudio.');
+            console.log('📋 Carregando playlist de exemplo...');
+            
+            if (!confirm('Deseja carregar uma playlist de exemplo com músicas cristãs populares?')) {
+                console.log('❌ Cancelado pelo usuário');
+                return;
             }
+            
+            const exampleTracks = [
+                { title: 'Amazing Grace', artist: 'Traditional', genre: 'Hino', duration: '4:15' },
+                { title: 'Rude Cruz', artist: 'Hinário Adventista', genre: 'Hino', duration: '4:30' },
+                { title: 'Oceanos', artist: 'Hillsong United', genre: 'Contemporary', duration: '6:45' },
+                { title: 'Como é Grande o Meu Deus', artist: 'Hillsong', genre: 'Contemporary', duration: '5:20' },
+                { title: 'Tua Graça me Basta', artist: 'Fernandinho', genre: 'Gospel', duration: '4:50' }
+            ];
+            
+            exampleTracks.forEach((track, index) => {
+                playlist.push({
+                    id: Date.now() + index,
+                    title: track.title,
+                    artist: track.artist,
+                    genre: track.genre,
+                    duration: track.duration,
+                    url: '',
+                    file: null,
+                    isExample: true
+                });
+            });
+            
+            renderPlaylist();
+            updateAutoMixStatus();
+            
+            console.log(`✅ ${exampleTracks.length} músicas de exemplo carregadas`);
+            alert('✅ Playlist de exemplo carregada! Use os botões de upload para adicionar arquivos.');
+        }
+
+        function clearPlaylist() {
+            console.log('🗑️ Limpando playlist...');
+            
+            if (!confirm('Tem certeza que deseja limpar toda a playlist?')) {
+                console.log('❌ Cancelado pelo usuário');
+                return;
+            }
+            
+            // Liberar URLs da memória
+            playlist.forEach(track => {
+                if (track.url && !track.isExample) {
+                    URL.revokeObjectURL(track.url);
+                }
+            });
+            
+            playlist = [];
+            currentPlaylistIndex = 0;
+            
+            if (autoMixPlaylistActive) {
+                stopAutoMixPlaylist();
+            }
+            
+            renderPlaylist();
+            updateAutoMixStatus();
+            
+            console.log('✅ Playlist limpa');
+            alert('✅ Playlist limpa com sucesso!');
+        }
+
+        function removeFromPlaylist(index) {
+            console.log(`🗑️ Removendo música no índice ${index}`);
+            
+            if (index < 0 || index >= playlist.length) {
+                console.error('❌ Índice inválido:', index);
+                return;
+            }
+            
+            const track = playlist[index];
+            
+            if (!confirm(`Remover "${track.title}" da playlist?`)) {
+                console.log('❌ Remoção cancelada pelo usuário');
+                return;
+            }
+            
+            // Liberar URL da memória
+            if (track.url && !track.isExample) {
+                URL.revokeObjectURL(track.url);
+            }
+            
+            playlist.splice(index, 1);
+            
+            // Ajustar índice atual se necessário
+            if (currentPlaylistIndex >= index) {
+                currentPlaylistIndex = Math.max(0, currentPlaylistIndex - 1);
+            }
+            
+            renderPlaylist();
+            updateAutoMixStatus();
+            
+            console.log(`✅ Música removida: ${track.title}`);
         }
 
         function clearPlaylist() {
@@ -1732,44 +1799,62 @@
         }
 
         function loadTrackToPlaylist(index) {
+            console.log(`📁 Carregando arquivo para música no índice ${index}`);
+            
+            if (index < 0 || index >= playlist.length) {
+                console.error('❌ Índice inválido:', index);
+                return;
+            }
+            
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = 'audio/*';
             
             input.onchange = function(e) {
                 const file = e.target.files[0];
-                if (file && file.type.startsWith('audio/')) {
-                    // Liberar URL anterior se existir
-                    if (playlist[index].url && !playlist[index].isExample) {
-                        URL.revokeObjectURL(playlist[index].url);
-                    }
-                    
-                    const url = URL.createObjectURL(file);
-                    playlist[index].url = url;
-                    playlist[index].file = file;
-                    
-                    // Obter duração do arquivo
-                    const audio = new Audio(url);
-                    audio.addEventListener('loadedmetadata', () => {
-                        const minutes = Math.floor(audio.duration / 60);
-                        const seconds = Math.floor(audio.duration % 60);
-                        playlist[index].duration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                        renderPlaylist();
-                    });
-                    
-                    audio.addEventListener('error', (e) => {
-                        console.error('Erro ao carregar áudio:', file.name, e);
-                        alert('Erro ao carregar o arquivo de áudio. Tente novamente.');
-                    });
-                    
-                    audio.load();
-                    renderPlaylist();
-                    
-                    console.log(`Arquivo carregado para: ${playlist[index].title}`);
-                    alert(`✅ Arquivo "${file.name}" carregado para "${playlist[index].title}"`);
-                } else {
-                    alert('Por favor, selecione um arquivo de áudio válido.');
+                
+                if (!file) {
+                    console.log('❌ Nenhum arquivo selecionado');
+                    return;
                 }
+                
+                if (!file.type.startsWith('audio/')) {
+                    console.log('❌ Arquivo não é de áudio:', file.type);
+                    alert('Por favor, selecione um arquivo de áudio válido.');
+                    return;
+                }
+                
+                console.log(`🎵 Carregando arquivo: ${file.name} para ${playlist[index].title}`);
+                
+                // Liberar URL anterior se existir
+                if (playlist[index].url && !playlist[index].isExample) {
+                    URL.revokeObjectURL(playlist[index].url);
+                }
+                
+                const url = URL.createObjectURL(file);
+                playlist[index].url = url;
+                playlist[index].file = file;
+                
+                // Obter duração do arquivo
+                const audio = new Audio(url);
+                audio.addEventListener('loadedmetadata', () => {
+                    const minutes = Math.floor(audio.duration / 60);
+                    const seconds = Math.floor(audio.duration % 60);
+                    playlist[index].duration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    renderPlaylist();
+                    console.log(`⏱️ Duração obtida: ${playlist[index].duration}`);
+                });
+                
+                audio.addEventListener('error', (e) => {
+                    console.error('❌ Erro ao carregar áudio:', file.name, e);
+                    alert('Erro ao carregar o arquivo de áudio. Tente novamente.');
+                });
+                
+                audio.load();
+                renderPlaylist();
+                
+                console.log(`✅ Arquivo carregado para: ${playlist[index].title}`);
+                alert(`✅ Arquivo "${file.name}" carregado!`);
             };
             
             input.click();
@@ -2034,39 +2119,64 @@
             }
         }
 
-        // Função de teste para debug
+        // FUNÇÃO DE TESTE PARA DEBUG
         function testPlaylistSystem() {
-            console.log('=== TESTE DO SISTEMA DE PLAYLIST ===');
-            console.log('Playlist atual:', playlist);
-            console.log('Elemento container:', document.getElementById('playlistContainer'));
-            console.log('Elemento counter:', document.getElementById('playlistCount'));
+            console.log('🧪 === TESTE DO SISTEMA DE PLAYLIST ===');
+            console.log('📋 Playlist atual:', playlist);
+            console.log('📦 Container:', document.getElementById('playlistContainer'));
+            console.log('🔢 Counter:', document.getElementById('playlistCount'));
             
             // Testar adição manual
-            playlist.push({
+            const testTrack = {
+                id: Date.now(),
                 title: 'Teste Música',
                 artist: 'Teste Artista',
                 genre: 'Teste',
                 duration: '3:45',
                 url: '',
+                file: null,
                 isExample: false
-            });
+            };
             
+            playlist.push(testTrack);
             renderPlaylist();
-            console.log('Música de teste adicionada');
+            
+            console.log('✅ Música de teste adicionada');
+            alert('🧪 Teste concluído! Música de teste adicionada à playlist.');
         }
 
-        // Inicializar verificação do sistema quando a página carregar
+        // INICIALIZAÇÃO DO SISTEMA
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOMContentLoaded - inicializando sistema...');
+            console.log('🚀 Inicializando Sistema de Playlist...');
             
-            // Aguardar um pouco para garantir que tudo está carregado
+            // Aguardar elementos DOM estarem prontos
             setTimeout(() => {
-                checkSystemStatus();
-                loadPlaylist();
-                updateAutoMixStatus();
-                console.log('Sistema inicializado com sucesso');
-                console.log('Para testar o sistema, abra o console e digite: testPlaylistSystem()');
-            }, 500);
+                try {
+                    // Verificar se elementos essenciais existem
+                    const container = document.getElementById('playlistContainer');
+                    const counter = document.getElementById('playlistCount');
+                    
+                    if (!container) {
+                        console.error('❌ Elemento playlistContainer não encontrado!');
+                        return;
+                    }
+                    
+                    if (!counter) {
+                        console.warn('⚠️ Elemento playlistCount não encontrado');
+                    }
+                    
+                    // Inicializar sistema
+                    checkSystemStatus();
+                    loadPlaylist();
+                    updateAutoMixStatus();
+                    
+                    console.log('✅ Sistema de Playlist inicializado com sucesso!');
+                    console.log('💡 Para testar, digite no console: testPlaylistSystem()');
+                    
+                } catch (error) {
+                    console.error('❌ Erro na inicialização:', error);
+                }
+            }, 1000);
         });
 
     </script>
